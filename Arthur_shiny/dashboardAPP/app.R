@@ -22,6 +22,10 @@ campo@data$NM_MUNICIP <- mymun$NM_MUNICIP
 ## colocar na mesma projecao
 mymun_lambert <- spTransform (mymun, crs(campo))
 
+## pallete of colors
+bins <- c(0, 0.25, 0.5, 0.75, 1, Inf)
+pal <- colorBin("YlOrRd", domain = campo$campo, bins = bins)
+
 ## funcao interna para desenhar os poligonos
 pol.coords <- function(input.polig){
   
@@ -226,15 +230,15 @@ server <- function(input, output, session){
                         options = layersControlOptions(collapsed = TRUE)) %>%
       ## grassland cover
       
-      addPolygons(fillColor= ~ campo
-                  , fillOpacity = 0.1
+      addPolygons(fillColor= ~ pal(campo)
+                  , fillOpacity = 0.7
                   , color= "white"
                   , stroke= FALSE
                   , highlight=highlightOptions(weight=0.5
                                                , color="gray"
                                                , fillOpacity= 0.3
                                                , fillColor="blue"
-                                               , bringToFront = FALSE)
+                                               , bringToFront = T)
                   , label = ~ NM_MUNICIP)
   })
   
