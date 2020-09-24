@@ -8,7 +8,7 @@ require(raster)
 require(here)
 
 ## carregar o shapefile dos municipios do RS
-mymun <- readOGR (dsn=here(), layer= "43MUE250GC_SIR")
+mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "43MUE250GC_SIR")
 
 ## funcao interna para desenhar os poligonos
 pol.coords <- function(input.polig){
@@ -117,7 +117,7 @@ server <- function(input, output, session){
       return ()
     else 
       leafletProxy ("map") %>%
-      setView (lng=click$lng, lat= click$lat, zoom = 6)
+      setView (lng=click$lng, lat= click$lat, zoom = 8)
   })
   
   # observar o clique e usar a funcao definida fora para desenhar o poligono

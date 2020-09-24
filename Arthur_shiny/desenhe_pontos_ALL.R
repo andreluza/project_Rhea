@@ -7,7 +7,7 @@ require(sp)
 require(raster)
 require(here)
 ## carregar o shapefile dos municipios do RS
-mymun <- readOGR (dsn=here(), layer= "43MUE250GC_SIR")
+mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "43MUE250GC_SIR")
 
 
 ## criar a UI
