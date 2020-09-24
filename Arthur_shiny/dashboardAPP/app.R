@@ -10,7 +10,17 @@ require(raster)
 require(here)
 
 ## carregar o shapefile dos municipios do RS
-mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "43MUE250GC_SIR")
+mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "43MUE250GC_SIR",
+                  use_iconv = T,encoding = "utf8")
+mymun <- mymun [-c(96,250),]
+## cobertura de campo
+campo <- readOGR (dsn=here("Arthur_shiny" , "dashboardAPP"),
+                  layer="arquivo_campo")
+# inserir nomes dos muns
+campo@data$NM_MUNICIP <- mymun$NM_MUNICIP
+
+## colocar na mesma projecao
+mymun_lambert <- spTransform (mymun, crs(campo))
 
 ## funcao interna para desenhar os poligonos
 pol.coords <- function(input.polig){
@@ -198,7 +208,7 @@ server <- function(input, output, session){
   
   output$leaf2 <- renderLeaflet({
     
-    leaflet(data=mymun) %>% 
+    leaflet(data=campo) %>% 
       setView(lng = -52.8, lat = -30.5, zoom = 6) %>%
       # Add two tiles
       addTiles(options = providerTileOptions(noWrap = TRUE),group="StreetMap")%>%
@@ -214,8 +224,9 @@ server <- function(input, output, session){
         editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions())) %>%
       addLayersControl( baseGroups = c("StreetMap","Satelite"),
                         options = layersControlOptions(collapsed = TRUE)) %>%
+      ## grassland cover
       
-      addPolygons(fillColor="white"
+      addPolygons(fillColor= ~ campo
                   , fillOpacity = 0.1
                   , color= "white"
                   , stroke= FALSE
