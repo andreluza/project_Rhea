@@ -222,49 +222,8 @@ occ_to_df <- lapply (occ, function (i)
 
 unique (unlist(lapply (occ_to_df, function (i) unique (i$data$prov))))
 
-#
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###
-
-
-# dados espaciais
-## escolha o layer "43MUE250GC_SIR.shp"
-munRS<- readOGR(dsn=getwd(),layer="43MUE250GC_SIR", encoding = "UTF-8")
-coord_xy <- gCentroid (munRS, byid=T)@coords 
-
-# Generate the neighbours (8 direct neighbours)
-neigh <- poly2nb (munRS)
-plot(neigh,cbind(coord_xy [,"x"], coord_xy [,"y"]))
-#neigh <-dnearneigh(cbind(coord_xy [,"x"], coord_xy [,"y"]),longlat = T,d1=0, d2=30)
-#plot(munRS[knearneigh(cbind(coord_xy [,"x"], coord_xy [,"y"]), k=10, longlat = T)$nn[1,],],col="red")
-
-# Number of neighbours ## quantos sitios estão conectados a n distancia
-table(card(neigh))
-# Convert the neighbourhood
-winnb <- nb2WB(neigh)
-
-#### data
-str(win.data2<- list(y=y2, M=dim(y2)[1], J= dim (y2)[2],effort= y2_effort, 
-                     num = winnb$num, adj = winnb$adj, weights = winnb$weights))
 
 
