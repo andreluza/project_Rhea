@@ -4,7 +4,7 @@ library(shinydashboard)
 library(leaflet)
 library(leaflet.extras)
 library(rgdal)
-library (rgdal)
+library(rgdal)
 require(sp)
 require(raster)
 require(here)
@@ -16,14 +16,16 @@ mymun <- mymun [-c(96,250),]
 ## cobertura de campo
 campo <- readOGR (dsn=here("Arthur_shiny" , "dashboardAPP"),
                   layer="arquivo_campo")
-# inserir nomes dos muns
-campo@data$NM_MUNICIP <- mymun$NM_MUNICIP
+
+
+# inserir area de campo
+mymun@data$campo <- campo$campo
 
 ## colocar na mesma projecao
-mymun_lambert <- spTransform (mymun, crs(campo))
+#mymun_lambert <- spTransform (mymun, crs(campo))
 
 ## pallete of colors
-bins <- c(0, 0.25, 0.5, 0.75, 1, Inf)
+bins <- c(0, 0.25, 0.5, 0.75, 1)
 pal <- colorBin("YlOrRd", domain = campo$campo, bins = bins)
 
 ## funcao interna para desenhar os poligonos
@@ -122,7 +124,8 @@ server <- function(input, output, session){
   output$map1 <- renderUI({
     req(is.null(values$map1.ok))
     
-    box(leafletOutput("leaf"),
+    box(width = 12,
+        leafletOutput("leaf"),
         strong("Click here when you finished to draw poligons:"),
         actionButton("map1.ok", "OK"))
   })
@@ -144,19 +147,19 @@ server <- function(input, output, session){
         circleMarkerOptions = F,
         editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions())) %>%
       addLayersControl( baseGroups = c("StreetMap","Satelite"),
-                        options = layersControlOptions(collapsed = TRUE)) %>%
+                        options = layersControlOptions(collapsed = FALSE)) %>%
       
-      addPolygons(fillColor="white"
-                  , fillOpacity = 0.1
-                  , color= "white"
-                  , stroke= FALSE
-                  , highlight=highlightOptions(weight=0.5
-                                               , color="gray"
-                                               , fillOpacity= 0.3
-                                               , fillColor="blue"
-                                               , bringToFront = FALSE)
-                  , label = ~ NM_MUNICIP)
-  })
+      addPolygons(fillColor="white", 
+                  fillOpacity = 0.1,
+                  color= "white", 
+                  stroke= FALSE, 
+                  highlight=highlightOptions(weight=0.5,
+                                             color="gray",
+                                             fillOpacity= 0.3,
+                                             fillColor="blue",
+                                             bringToFront = FALSE),
+                  label = ~ NM_MUNICIP)
+    })
   
   # observar o clique e usar a funcao definida fora para desenhar o poligono
   observeEvent(input$leaf_draw_all_features, {
@@ -205,14 +208,21 @@ server <- function(input, output, session){
   output$map2 <- renderUI({
     req(is.null(values$map2.ok))
     
-    box(leafletOutput("leaf2"),
+    box(width = 12,
+        radioButtons("opacity", 
+                     "Change layer opacity:", 
+                     choiceNames = list("low","high"),
+                     choiceValues = list(0.25, 0.50),
+                     selected = 0.50,
+                     inline = T),
+        leafletOutput("leaf2"),
         strong("Click here when you finished to draw poligons:"),
         actionButton("map2.ok", "OK"))
   })
   
   output$leaf2 <- renderLeaflet({
     
-    leaflet(data=campo) %>% 
+    leaflet(data=mymun) %>% 
       setView(lng = -52.8, lat = -30.5, zoom = 6) %>%
       # Add two tiles
       addTiles(options = providerTileOptions(noWrap = TRUE),group="StreetMap")%>%
@@ -227,20 +237,25 @@ server <- function(input, output, session){
         circleMarkerOptions = F,
         editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions())) %>%
       addLayersControl( baseGroups = c("StreetMap","Satelite"),
-                        options = layersControlOptions(collapsed = TRUE)) %>%
+                        options = layersControlOptions(collapsed = FALSE)) %>%
       ## grassland cover
-      
-      addPolygons(fillColor= ~ pal(campo)
-                  , fillOpacity = 0.7
-                  , color= "white"
-                  , stroke= FALSE
-                  , highlight=highlightOptions(weight=0.5
-                                               , color="gray"
-                                               , fillOpacity= 0.3
-                                               , fillColor="blue"
-                                               , bringToFront = T)
-                  , label = ~ NM_MUNICIP)
-  })
+      addPolygons(fillColor= ~pal(campo), 
+                  fillOpacity = input$opacity,
+                  color= "white", 
+                  stroke= FALSE, 
+                  highlight=highlightOptions(weight=0.1,
+                                             color="grey",
+                                             fillOpacity= 0.3,
+                                             fillColor="blue",
+                                             bringToFront = FALSE),
+                  label = ~ NM_MUNICIP
+                  ) %>% 
+      addLegend(position = "bottomright",
+                labels = c("0-25", "25-50", "50-75", "75-100"),
+                colors = pal(seq(0,0.75,0.25)),
+                opacity = input$opacity,
+                title = "Grassland cover (%)") 
+ })
   
   # observar o clique e usar a funcao definida fora para desenhar o poligono
   observeEvent(input$leaf2_draw_all_features, {
