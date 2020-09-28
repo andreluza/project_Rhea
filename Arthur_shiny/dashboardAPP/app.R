@@ -13,9 +13,13 @@ require(here)
 mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "MyMun",
                   use_iconv = T,encoding = "utf8")
 
+## transformar zero de cobertura de campo em NA, para ficar na cor adequada
+mymun$campo[which(mymun$campo == 0)] <- NA
+
 ## pallete of colors
-bins <- c(0, 0.25, 0.5, 0.75, 1)
-pal <- colorBin("YlOrRd", domain = campo$campo, bins = bins)
+bins <- c(0,0.25,0.5,0.75,1)
+pal <- colorBin("YlOrRd", domain = mymun$campo, bins = bins,
+                na.color="white")
 
 ## funcao interna para desenhar os poligonos
 pol.coords <- function(input.polig){
@@ -56,7 +60,7 @@ short.name <- function(input.name){
   return(f.name)
 }
 
-head <- dashboardHeader(title = em("Rhea Americana"))
+head <- dashboardHeader(title = em("Rhea americana"))
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -131,7 +135,10 @@ server <- function(input, output, session){
         column(width = 3,
                "Use the map features to draw as many polygons as you need 
                         to describe your knowlegde on", em("Rhea americana"),
-                        "distribution in the State of Rio Grande do Sul.",
+                        "distribution in the State of Rio Grande do Sul. 
+                        Use the function ",strong("Draw a polygon"), "to start drawing.",
+               "Move the mouse over the RS map to see the name of the municipalities.
+               One particular polygon must end at its initial point.",
                br(),
                br(),
                strong("Click here when you finished to draw poligons:"),
@@ -230,7 +237,10 @@ server <- function(input, output, session){
         column(width = 3, 
                helpText(h5("Use the map features to draw as many polygons as you need 
                         to describe your knowlegde on", em("Rhea americana"),
-                           "distribution in the State of Rio Grande do Sul.")),
+                           "distribution in the State of Rio Grande do Sul.
+                           Use the function ",strong("Draw a polygon"), "to start drawing.",
+                           "Now, enjoy the help of the layer with grassland cover!
+                           Remember that one particular polygon must end at its initial point.")),
                br(),
                br(),
                strong("Click here when you finished to draw poligons:"),
@@ -280,8 +290,8 @@ server <- function(input, output, session){
                   label = ~ NM_MUNICIP
                   ) %>% 
       addLegend(position = "bottomright",
-                labels = c("0-25", "25-50", "50-75", "75-100"),
-                colors = pal(seq(0,0.75,0.25)),
+                labels = c("0",">0-25", ">25-50", ">50-75", ">75-100"),
+                colors = c("white",pal(seq(0,0.75,0.25))),
                 opacity = input$opacity,
                 title = "Grassland cover (%)") 
  })
@@ -340,6 +350,7 @@ server <- function(input, output, session){
         br(),
         strong("Please, download the file with the results and mail it to "),
         code("luza.andre@gmail.com"),
+        strong(" with the subject "), em("Expert knowledge about greater Rhea distribution"),
         br(),
         br(),
         downloadButton("download"))
