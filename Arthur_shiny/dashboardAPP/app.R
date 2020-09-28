@@ -10,19 +10,8 @@ require(raster)
 require(here)
 
 ## carregar o shapefile dos municipios do RS
-mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "43MUE250GC_SIR",
+mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "MyMun",
                   use_iconv = T,encoding = "utf8")
-mymun <- mymun [-c(96,250),]
-## cobertura de campo
-campo <- readOGR (dsn=here("Arthur_shiny" , "dashboardAPP"),
-                  layer="arquivo_campo")
-
-
-# inserir area de campo
-mymun@data$campo <- campo$campo
-
-## colocar na mesma projecao
-#mymun_lambert <- spTransform (mymun, crs(campo))
 
 ## pallete of colors
 bins <- c(0, 0.25, 0.5, 0.75, 1)
@@ -57,6 +46,16 @@ make.polygon <- function(df){
   
 }
 
+short.name <- function(input.name){
+  name.split <- strsplit(input.name, " ")[[1]]
+  
+  last.name <- name.split[length(name.split)]
+  abbrev <- paste0(sapply(name.split, substr, 1, 1)[-length(name.split)], collapse = "")
+  
+  f.name <- paste(last.name, abbrev, sep = "_")
+  return(f.name)
+}
+
 head <- dashboardHeader(title = em("Rhea Americana"))
 
 sidebar <- dashboardSidebar(
@@ -80,7 +79,8 @@ body <- dashboardBody(
           uiOutput("map1"),
           uiOutput('end.map1'),
           uiOutput("map2"),
-          uiOutput('end.map2')))
+          uiOutput('end.map2'),
+          uiOutput("send.result")))
   )
 
 
@@ -96,6 +96,7 @@ server <- function(input, output, session){
 
 # Identificação do especialista -------------------------------------------
 
+  #configura a UI inicial 
   output$text <- renderUI({
     req(is.null(values$nameBT))
     tagList(
@@ -103,13 +104,15 @@ server <- function(input, output, session){
       actionButton("nameBT", "OK")
     )
     })
-    
+  
+  
   observeEvent(input$nameBT,{
     values$name   <- input$name
     values$nameBT <- input$nameBT
     values$map1.ok <- NULL
   })
 
+  # Apresenta o nome fornecido
   output$textout <- renderUI({
     req(!is.null(values$nameBT))
     
@@ -120,16 +123,26 @@ server <- function(input, output, session){
 
 # Mapa 1 ------------------------------------------------------------------
 
-  
+  #configura a UI do mapa 1
   output$map1 <- renderUI({
     req(is.null(values$map1.ok))
     
     box(width = 12,
-        leafletOutput("leaf"),
-        strong("Click here when you finished to draw poligons:"),
-        actionButton("map1.ok", "OK"))
+        column(width = 3,
+               "Use the map features to draw as many polygons as you need 
+                        to describe your knowlegde on", em("Rhea americana"),
+                        "distribution in the State of Rio Grande do Sul.",
+               br(),
+               br(),
+               strong("Click here when you finished to draw poligons:"),
+               actionButton("map1.ok", "OK")),
+        
+        column(width = 9,
+               leafletOutput("leaf"))
+        )
   })
   
+  #mapa 1
   output$leaf <- renderLeaflet({
     
     leaflet(data=mymun) %>% 
@@ -174,6 +187,7 @@ server <- function(input, output, session){
     
   })
   
+  # guardar poligonos desenhados
   observeEvent(input$map1.ok, {
     if(length(values$list.pol.df) == 1){
       values$pol <- make.polygon(values$list.pol.df[[1]])
@@ -188,12 +202,14 @@ server <- function(input, output, session){
     df <- data.frame(nome.poligono = paste("poligono", 
                                            1:length(values$list.pol.df)))
     
-    shape1 <- SpatialPolygonsDataFrame(shape, df)
+    values$shape1 <- SpatialPolygonsDataFrame(shape, df)
     values$map1.ok <- "map 1 finished"
-    values$text.end.map1 <- paste("You drew", length(shape1), "polygons")
+    plural <- ifelse(length(values$shape1) > 1, "polygons", "polygon")
+    values$text.end.map1 <- paste("You drew", length(values$shape1), plural)
     values$map2.ok <- NULL
   })
   
+  # Configura UI de fim da primeira etapa
   output$end.map1 <- renderUI({
     req(values$map1.ok == "map 1 finished")
     
@@ -204,22 +220,35 @@ server <- function(input, output, session){
   
 
 # Mapa 2 ------------------------------------------------------------------
-
+  
+  
+  #configura a UI do mapa 2
   output$map2 <- renderUI({
     req(is.null(values$map2.ok))
     
     box(width = 12,
-        radioButtons("opacity", 
-                     "Change layer opacity:", 
-                     choiceNames = list("low","high"),
-                     choiceValues = list(0.25, 0.50),
-                     selected = 0.50,
-                     inline = T),
-        leafletOutput("leaf2"),
-        strong("Click here when you finished to draw poligons:"),
-        actionButton("map2.ok", "OK"))
+        column(width = 3, 
+               helpText(h5("Use the map features to draw as many polygons as you need 
+                        to describe your knowlegde on", em("Rhea americana"),
+                           "distribution in the State of Rio Grande do Sul.")),
+               br(),
+               br(),
+               strong("Click here when you finished to draw poligons:"),
+               actionButton("map2.ok", "OK")
+               ),
+        column(width = 9,
+               radioButtons("opacity", 
+                            "Change layer opacity:", 
+                            choiceNames = list("low","high"),
+                            choiceValues = list(0.25, 0.50),
+                            selected = 0.50,
+                            inline = T),
+               leafletOutput("leaf2")
+               )
+        )
   })
   
+  #mapa 2
   output$leaf2 <- renderLeaflet({
     
     leaflet(data=mymun) %>% 
@@ -270,6 +299,7 @@ server <- function(input, output, session){
     
   })
   
+  # guardar poligonos desenhados
   observeEvent(input$map2.ok, {
     if(length(values$list.pol.df) == 1){
       values$pol <- make.polygon(values$list.pol.df[[1]])
@@ -284,19 +314,61 @@ server <- function(input, output, session){
     df <- data.frame(nome.poligono = paste("poligono", 
                                            1:length(values$list.pol.df)))
     
-    shape2 <- SpatialPolygonsDataFrame(shape, df)
+    values$shape2 <- SpatialPolygonsDataFrame(shape, df)
     values$map2.ok <- "map 2 finished"
-    values$text.end.map2 <- paste("You drew", length(shape2), "polygons")
-    print(shape2)
+    plural <- ifelse(length(values$shape2) > 1, "polygons", "polygon")
+    values$text.end.map2 <- paste("You drew", length(values$shape2), plural)
   })
   
+  # Configura UI de fim da primeira etapa
   output$end.map2 <- renderUI({
     req(values$map2.ok == "map 2 finished")
     
     box(width = 12,
-        strong("Task Finished. Thank You!"),
+        strong("Task Finished!"),
         h5(values$text.end.map2))
   })  
+
+# Download ----------------------------------------------------------------
+
+  #Configura UI de Download
+  output$send.result <- renderUI({
+    req(values$map2.ok == "map 2 finished")
+    
+    box(width = 12,
+        strong("Thank you for sharing your knowledge with us!"),
+        br(),
+        strong("Please, download the file with the results and mail it to "),
+        code("luza.andre@gmail.com"),
+        br(),
+        br(),
+        downloadButton("download"))
+    
+    
+    
+  })
+  
+  #Prepara objetos e salva o arquivo
+  observeEvent(values$map2.ok,{
+    if(values$map2.ok == "map 2 finished"){
+      data <- list(Name = input$name,
+                   Shape_Mun = values$shape1,
+                   Shape_campo = values$shape2)
+      exp.name <- short.name(data$Name)
+    }
+  
+    
+    output$download <- downloadHandler(
+      
+      filename = function() {
+        paste(exp.name, "_",  Sys.Date(), '.rds', sep='')
+      },
+      content = function(con) {
+        saveRDS(data, con)
+      })
+  })
+  
+  
   
 }
 
