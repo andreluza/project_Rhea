@@ -1,0 +1,10 @@
+name: dashboardapp
+title:
+username:
+account: andreluza
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2938121
+bundleId: 3703965
+url: https://andreluza.shinyapps.io/dashboardapp/
+when: 1601898067.06713

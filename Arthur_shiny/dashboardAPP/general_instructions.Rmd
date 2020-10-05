@@ -9,14 +9,14 @@ output: html_document
 
 #### Who are we? What are we doing?
 
-We are a team of researchers from the Universidade Federal de Santa Maria (UFSM) and the Universidade Federal do Rio Grande do Sul (UFRGS) interested in using citizen-science data to modeling the distribution of iconic and endangered species, such as the vinaceous-breasted amazon (*Amazona vinacea*) and the greater rhea (*Rhea americana*). This is a project focused on greater rhea. 
-The project aims to estimate the distribution of this species across the municipalities of Rio Grande do Sul (RS), the southernmost state of Brazil. We will estimate distribution based on three sources of evidence: 1) detection data from citizen-science projects (e.g. E-BIRD, GBIF, VERTNET), 2) expert knowledge, and 3) site-occupancy modeling based on the integration of data from citizen-science projects.
+We are a team of researchers from the Universidade Federal de Santa Maria (UFSM) and the Universidade Federal do Rio Grande do Sul (UFRGS) interested in using citizen-science data to model the distribution of iconic and endangered species, such as the Vinaceous-breasted amazon (*Amazona vinacea*) and the Greater rhea (*Rhea americana*). This is a project focused on greater rhea. 
+The project aims to estimate the distribution of this species across the municipalities of Rio Grande do Sul (RS), the southernmost state of Brazil. We will estimate distribution based on the approaches: 1) detection data from several citizen-science projects (WikiAves, GBIF, E-bird, VertNet, iNaturalist), 2) expert knowledge, and 3) site-occupancy modeling based on the integration of data from citizen-science projects.
 
 #### What do we want from you?
 
-We already get information of the first and third sources of evidence. Now, we need your help to gather data of the second source! We kindly invite you to share your knowledge about greater rhea distribution in RS. To help you with that, we built two iterative maps where you can drawn one or more polygons bounding the localities where you detected and / or know that rhea can be detected. These maps are: 1) map with the boundaries of the municipalities of RS, and 2) map with the cover of natural grasslands per municipality (from Hofmann et al. 2015). We hope that these maps help you!
+We already get information for applying the first and third approaches. Now, we need your help to gather evidence for the second approach! We kindly invite you to share your knowledge about Greater rhea distribution in RS. To help you with that, we built two iterative maps where you can draw one or more polygons bounding the localities where you detected and / or know that rhea can be detected. These maps are: 1) map with the boundaries of the municipalities of RS, and 2) map with the cover of natural grasslands per municipality (from Hofmann et al. 2015). We hope that these maps help you!
 
-Now that you read these general instructions, go to the guide 'Define the distribution' in the right side of this page to start drawing the distribution polygons.
+Now that you read these general instructions, go to the guide 'Define the distribution' on the right side of this page to start drawing the distribution polygons.
 
 Best regards,
 

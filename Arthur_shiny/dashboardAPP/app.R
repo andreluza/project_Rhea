@@ -4,13 +4,12 @@ library(shinydashboard)
 library(leaflet)
 library(leaflet.extras)
 library(rgdal)
-library(rgdal)
-require(sp)
-require(raster)
-require(here)
+library(sp)
+library(raster)
+library(here)
 
 ## carregar o shapefile dos municipios do RS
-mymun <- readOGR (dsn=here("data","shape_munRS"), layer= "MyMun",
+mymun <- readOGR (dsn=here(), layer= "MyMun",
                   use_iconv = T,encoding = "utf8")
 
 ## transformar zero de cobertura de campo em NA, para ficar na cor adequada
@@ -72,9 +71,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "Intro", 
-            includeMarkdown(here("Arthur_shiny",
-                                  "dashboardAPP",
-                                 "general_instructions.Rmd"))
+            includeMarkdown(here("general_instructions.Rmd"))
             ),
   tabItem(tabName = "Draw",
           box(width = 12,
@@ -141,7 +138,7 @@ server <- function(input, output, session){
                One particular polygon must end at its initial point.",
                br(),
                br(),
-               strong("Click here when you finished to draw poligons:"),
+               strong("Click here when you finished drawing poligons:"),
                actionButton("map1.ok", "OK")),
         
         column(width = 9,
@@ -243,7 +240,7 @@ server <- function(input, output, session){
                            Remember that one particular polygon must end at its initial point.")),
                br(),
                br(),
-               strong("Click here when you finished to draw poligons:"),
+               strong("Click here when you finished drawing poligons:"),
                actionButton("map2.ok", "OK")
                ),
         column(width = 9,
@@ -365,6 +362,9 @@ server <- function(input, output, session){
       data <- list(Name = input$name,
                    Shape_Mun = values$shape1,
                    Shape_campo = values$shape2)
+      crs (data$Shape_Mun) <- "+proj=longlat +ellps=GRS80 +no_defs" #
+      crs (data$Shape_campo) <- "+proj=longlat +ellps=GRS80 +no_defs"#
+      
       exp.name <- short.name(data$Name)
     }
   
