@@ -1,0 +1,14 @@
+---
+title: "Map instructions"
+author: "arthur"
+date: "05/10/2020"
+output: html_document
+---
+
+Use the map features to draw as many polygons as you need to describe your knowlegde on *Rhea americana* distribution in the State of Rio Grande do Sul. 
+
+Use the function **Draw a polygon** to start drawing.
+Move the mouse over the RS map to see the name of the municipalities. 
+
+**Now, enjoy the help of the layer with grassland cover!**
+Remember that at least one polygon must be draw at this initial point.

@@ -8,6 +8,7 @@ library(sp)
 library(raster)
 library(here)
 
+source("idioma.R", encoding = "utf-8")
 ## carregar o shapefile dos municipios do RS
 mymun <- readOGR (dsn=here(), layer= "MyMun",
                   use_iconv = T,encoding = "utf8")
@@ -63,15 +64,17 @@ head <- dashboardHeader(title = em("Rhea americana"))
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("General instructions", tabName ="Intro", icon = icon("info")),
-    menuItem("Define the distribution", tabName ="Draw",icon = icon("map"))
+    selectInput("language", label = "", 
+                choices = c("Português" = "pt", "English" = "en")),
+    sidebarMenuOutput("menu")
+    
   )
 )
 
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "Intro", 
-            includeMarkdown(here("general_instructions.Rmd"))
+            uiOutput("instructions")
             ),
   tabItem(tabName = "Draw",
           box(width = 12,
@@ -95,13 +98,28 @@ server <- function(input, output, session){
   values$map1.ok <- "ok"
   values$map2.ok <- "ok"
 
+
+# idioma menu -------------------------------------------------------------
+
+  output$instructions <- renderUI({
+    includeMarkdown(idioma[["instructions"]][[input$language]])
+  })
+  
+  output$menu <- renderMenu({
+    sidebarMenu(
+      menuItem(idioma[["Intro"]][[input$language]], tabName ="Intro", icon = icon("info")),
+      menuItem(idioma[["Draw"]][[input$language]], tabName ="Draw",icon = icon("map"))
+    )
+  })
+  
+
 # Identificação do especialista -------------------------------------------
 
   #configura a UI inicial 
   output$text <- renderUI({
     req(is.null(values$nameBT))
     tagList(
-      textInput("name", "Full name:"),
+      textInput("name", idioma[["name"]][[input$language]]),
       actionButton("nameBT", "OK")
     )
     })
@@ -118,7 +136,7 @@ server <- function(input, output, session){
     req(!is.null(values$nameBT))
     
     tagList(
-      h3(strong("Name:"), values$name)
+      h4(strong(idioma[["name.output"]][[input$language]]), values$name)
     )
   })
 
@@ -130,15 +148,10 @@ server <- function(input, output, session){
     
     box(width = 12,
         column(width = 3,
-               "Use the map features to draw as many polygons as you need 
-                        to describe your knowlegde on", em("Rhea americana"),
-                        "distribution in the State of Rio Grande do Sul. 
-                        Use the function ",strong("Draw a polygon"), "to start drawing.",
-               "Move the mouse over the RS map to see the name of the municipalities.
-               One particular polygon must end at its initial point.",
+               includeMarkdown(idioma[["map1.help.text"]][[input$language]]),
                br(),
                br(),
-               strong("Click here when you finished drawing poligons:"),
+               strong(idioma[["map.ok"]][[input$language]]),
                actionButton("map1.ok", "OK")),
         
         column(width = 9,
@@ -208,8 +221,8 @@ server <- function(input, output, session){
     
     values$shape1 <- SpatialPolygonsDataFrame(shape, df)
     values$map1.ok <- "map 1 finished"
-    plural <- ifelse(length(values$shape1) > 1, "polygons", "polygon")
-    values$text.end.map1 <- paste("You drew", length(values$shape1), plural)
+    
+
     values$map2.ok <- NULL
   })
   
@@ -217,8 +230,15 @@ server <- function(input, output, session){
   output$end.map1 <- renderUI({
     req(values$map1.ok == "map 1 finished")
     
+    plural <- ifelse(length(values$shape1) > 1, 
+                     idioma[["plural"]][[input$language]], 
+                     idioma[["singular"]][[input$language]])
+    
+    values$text.end.map1 <- paste(idioma[["drew"]][[input$language]],
+                                  length(values$shape1), plural)
+    
     box(width = 12,
-        strong("You have finished the step 1"),
+        strong(idioma[["end.step1"]][[input$language]]),
         h5(values$text.end.map1))
   })
   
@@ -232,21 +252,16 @@ server <- function(input, output, session){
     
     box(width = 12,
         column(width = 3, 
-               helpText(h5("Use the map features to draw as many polygons as you need 
-                        to describe your knowlegde on", em("Rhea americana"),
-                           "distribution in the State of Rio Grande do Sul.
-                           Use the function ",strong("Draw a polygon"), "to start drawing.",
-                           "Now, enjoy the help of the layer with grassland cover!
-                           Remember that one particular polygon must end at its initial point.")),
+               includeMarkdown(idioma[["map2.help.text"]][[input$language]]),
                br(),
                br(),
-               strong("Click here when you finished drawing poligons:"),
+               strong(idioma[["map.ok"]][[input$language]]),
                actionButton("map2.ok", "OK")
                ),
         column(width = 9,
                radioButtons("opacity", 
-                            "Change layer opacity:", 
-                            choiceNames = list("low","high"),
+                            idioma[["opacity"]][[input$language]], 
+                            choiceNames = idioma[["opacity.level"]][[input$language]],
                             choiceValues = list(0.25, 0.50),
                             selected = 0.50,
                             inline = T),
@@ -290,7 +305,7 @@ server <- function(input, output, session){
                 labels = c("0",">0-25", ">25-50", ">50-75", ">75-100"),
                 colors = c("white",pal(seq(0,0.75,0.25))),
                 opacity = input$opacity,
-                title = "Grassland cover (%)") 
+                title = idioma[["legend.map"]][[input$language]]) 
  })
   
   # observar o clique e usar a funcao definida fora para desenhar o poligono
@@ -323,16 +338,22 @@ server <- function(input, output, session){
     
     values$shape2 <- SpatialPolygonsDataFrame(shape, df)
     values$map2.ok <- "map 2 finished"
-    plural <- ifelse(length(values$shape2) > 1, "polygons", "polygon")
-    values$text.end.map2 <- paste("You drew", length(values$shape2), plural)
-  })
+    
+     })
   
   # Configura UI de fim da primeira etapa
   output$end.map2 <- renderUI({
     req(values$map2.ok == "map 2 finished")
     
+    plural <- ifelse(length(values$shape2) > 1, 
+                     idioma[["plural"]][[input$language]], 
+                     idioma[["singular"]][[input$language]])
+    
+    values$text.end.map2 <- paste(idioma[["drew"]][[input$language]], length(values$shape2), plural)
+    
+    
     box(width = 12,
-        strong("Task Finished!"),
+        strong(idioma[["end.step2"]][[input$language]]),
         h5(values$text.end.map2))
   })  
 
@@ -343,11 +364,12 @@ server <- function(input, output, session){
     req(values$map2.ok == "map 2 finished")
     
     box(width = 12,
-        strong("Thank you for sharing your knowledge with us!"),
+        strong(idioma[["download"]][[input$language]][1]),
         br(),
-        strong("Please, download the file with the results and mail it to "),
+        strong(idioma[["download"]][[input$language]][2]),
         code("luza.andre@gmail.com"),
-        strong(" with the subject "), em("Expert knowledge about greater Rhea distribution"),
+        strong(idioma[["download"]][[input$language]][3]), 
+        em("Expert knowledge about greater Rhea distribution"),
         br(),
         br(),
         downloadButton("download"))
