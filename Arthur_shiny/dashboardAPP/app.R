@@ -72,6 +72,28 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+  tags$head(tags$script('
+      // Define function to set height of "map" and "map_container"
+      setHeight = function() {
+        var window_height = $(window).height();
+        var header_height = $(".main-header").height();
+
+        var boxHeight = window_height - header_height - 30;
+
+        $("#leaf").height(boxHeight - 20);
+        $("#leaf2").height(boxHeight - 40);
+      };
+
+      // Set input$box_height when the connection is established
+      $(document).on("shiny:connected", function(event) {
+        setHeight();
+      });
+
+      // Refresh the box height on every window resize event    
+      $(window).on("resize", function(){
+        setHeight();
+      });
+    ')),
   tabItems(
     tabItem(tabName = "Intro", 
             uiOutput("instructions")
@@ -146,7 +168,7 @@ server <- function(input, output, session){
   output$map1 <- renderUI({
     req(is.null(values$map1.ok))
     
-    box(width = 12,
+    box(width = 12, id = "map_cointainer",
         column(width = 3,
                includeMarkdown(idioma[["map1.help.text"]][[input$language]]),
                br(),
@@ -250,7 +272,7 @@ server <- function(input, output, session){
   output$map2 <- renderUI({
     req(is.null(values$map2.ok))
     
-    box(width = 12,
+    box(width = 12, #id = "map_container_2",
         column(width = 3, 
                includeMarkdown(idioma[["map2.help.text"]][[input$language]]),
                br(),
