@@ -1,26 +1,25 @@
 ---
-title: "Modeling the distribution of Greater Rhea *Rhea americana* in Rio Grande do Sul"
+title: "Modelagem da distribuição da Ema (*Rhea americana*) no Rio Grande do Sul"
 author: "André Luza, Arthur V. Rodrigues, Viviane Zulian, Gonçalo Ferraz"
 output: html_document
 ---
 
-# Precisa ser feita a tradução desse markdown!
-# "general_instructions_pt.Rmd"
-
-## Modeling the distribution of the Greater Rhea (*Rhea americana*) in Rio Grande do Sul
+## Modelagem da distribuição da Ema (*Rhea americana*) no Rio Grande do Sul
 ### André L. Luza, Arthur V. Rodrigues, Viviane Zulian & Gonçalo Ferraz
 
-#### Who are we? What are we doing?
+#### Quem somos nós? O que estamos fazendo?
 
-We are a team of researchers from the Universidade Federal de Santa Maria (UFSM) and the Universidade Federal do Rio Grande do Sul (UFRGS) interested in using citizen-science data to model the distribution of iconic and endangered species, such as the Vinaceous-breasted amazon (*Amazona vinacea*) and the Greater rhea (*Rhea americana*). This is a project focused on greater rhea. 
-The project aims to estimate the distribution of this species across the municipalities of Rio Grande do Sul (RS), the southernmost state of Brazil. We will estimate distribution based on the approaches: 1) detection data from several citizen-science projects (WikiAves, GBIF, E-bird, VertNet, iNaturalist), 2) expert knowledge, and 3) site-occupancy modeling based on the integration of data from citizen-science projects.
+Somos um time de pesquisadores da Universidade Federal de Santa Maria (UFSM) e da Universidade Federal do Rio Grande do Sul (UFRGS) interessados em usar dados de ciência cidadã para modelar a distribuição de espécies icônicas e ameaçadas de extinção, como é o caso do papagaio-do-peito-roxo (*Amazona vinacea*) e da ema (*Rhea americana*). Este projeto tem foco na distribuição da ema.
 
-#### What do we want from you?
+O projeto tem o objetivo de estimar a distribuição da espécie nos municípios do Rio Grande do Sul (RS). Para tanto, utilizaremos 1) dados de detecção e não detecção da ema nos municípios do RS oriundos de diferentes projetos de ciência cidadã (WikiAves, GBIF, E-bird, VertNet, iNaturalist), 2) conhecimento de ornitólogos especialistas, e 3) modelagem da probabilidade de ocupação de sítios (*site-occupancy modeling*) utilizando a integração de dados dos diferentes projetos de ciência cidadã.
 
-We already get information for applying the first and third approaches. Now, we need your help to gather evidence for the second approach! We kindly invite you to share your knowledge about Greater rhea distribution in RS. To help you with that, we built two iterative maps where you can draw one or more polygons bounding the localities where you detected and / or know that rhea can be detected. These maps are: 1) map with the boundaries of the municipalities of RS, and 2) map with the cover of natural grasslands per municipality (from Hofmann et al. 2015). We hope that these maps help you!
+#### O que nós queremos pedir a você?
 
-Now that you read these general instructions, go to the guide 'Define the distribution' on the right side of this page to start drawing the distribution polygons.
+Nós já temos os dados dos diferentes projetos de ciência cidadã, e já temos estimativas de distribuição baseada na probabilidade de ocupação de sítios. Agora, nós precisamos de sua ajuda de ornitólogo especialista para obter informações sobre a distribuição da ema com base em observações e experiência a campo. Por isso, lhe convidamos para compartilhar seu conhecimento sobre a distribuição da ema no RS. Para lhe ajudar com esta tarefa, preparamos este aplicativo com dois mapas iterativos. Neles  você pode desenhar um ou mais polígonos delimitando a área que você detectou e/ou que sabe que a ema pode ser detectada. Estes mapas iterativos são: 1) mapa com os limites dos municípios do RS, e 2) mapa com a cobertura de campos dos municípios (de Hofmann et al. 2015). Esperamos que estes mapas lhe auxiliem ao longo do processo de desenho dos polígonos!
 
-Best regards,
+Agora que você já conhece as instruções gerais, vá para a guia 'Desenhe a distribuição' no lado direto desta página para começar a desenhar os polígonos de distribuição.
+Ressaltamos que você pode suprimir a guia da esquerda a qualquer momento. Isto pode ser útil para ver mapas em tamanho maior. Para suprimir a barra basta clicar no ícone de três barras sobrepostas, ao lado da escrita *Rhea americana* situada na faixa verde da porção superior desta tela. 
+
+Nossos sinceros cumprimentos,
 
 André, Arthur, Viviane, Gonçalo
