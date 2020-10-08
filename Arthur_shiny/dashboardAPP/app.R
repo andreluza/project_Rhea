@@ -1,14 +1,8 @@
-# Dashboard
-library(shiny)
-library(shinydashboard)
-library(leaflet)
-library(leaflet.extras)
-library(rgdal)
-library(sp)
-library(raster)
-library(here)
-
+# load packages
+source ("packages.R")
+# language definitions
 source("idioma.R", encoding = "utf-8")
+
 ## carregar o shapefile dos municipios do RS
 mymun <- readOGR (dsn=here(), layer= "MyMun",
                   use_iconv = T,encoding = "utf8")
@@ -391,7 +385,7 @@ server <- function(input, output, session){
         strong(idioma[["download"]][[input$language]][2]),
         code("luza.andre@gmail.com"),
         strong(idioma[["download"]][[input$language]][3]), 
-        em("Expert knowledge about greater Rhea distribution"),
+        em("Expert knowledge about Greater rhea distribution"),
         br(),
         br(),
         downloadButton("download"))
