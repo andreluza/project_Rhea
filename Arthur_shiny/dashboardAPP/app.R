@@ -66,29 +66,9 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
-  tags$head(tags$script('
-      // Define function to set height of "map" and "map_container"
-      setHeight = function() {
-        var window_height = $(window).height();
-        var header_height = $(".main-header").height();
-
-        var boxHeight = window_height - header_height - 30;
-
-        $("#leaf").height(boxHeight - 20);
-        $("#leaf2").height(boxHeight - 40);
-      };
-
-      // Set input$box_height when the connection is established
-      $(document).on("shiny:connected", function(event) {
-        setHeight();
-      });
-
-      // Refresh the box height on every window resize event    
-      $(window).on("resize", function(){
-        setHeight();
-      });
-    ')),
-  tabItems(
+  tags$style(type = "text/css", "#leaf {height: calc(100vh - 80px) !important;}"),
+  tags$style(type = "text/css", "#leaf2 {height: calc(100vh - 90px) !important;}"),
+   tabItems(
     tabItem(tabName = "Intro", 
             uiOutput("instructions")
             ),
