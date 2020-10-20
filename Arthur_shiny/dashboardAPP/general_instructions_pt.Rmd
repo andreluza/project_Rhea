@@ -9,7 +9,7 @@ output: html_document
 
 #### Quem somos nós? O que estamos fazendo?
 
-Somos um time de pesquisadores da Universidade Federal de Santa Maria (UFSM) e da Universidade Federal do Rio Grande do Sul (UFRGS) interessados em usar dados de ciência cidadã para modelar a distribuição de espécies icônicas e ameaçadas de extinção, como é o caso do papagaio-do-peito-roxo (*Amazona vinacea*) e da ema (*Rhea americana*). Este projeto tem foco na distribuição da ema.
+Somos um time de pesquisadores da Universidade Federal de Santa Maria (UFSM) e da Universidade Federal do Rio Grande do Sul (UFRGS) interessados em usar dados de ciência cidadã para modelar a distribuição de espécies carismáticas e ameaçadas, como é o caso do papagaio-do-peito-roxo (*Amazona vinacea*) e da ema (*Rhea americana*). Este projeto tem foco na distribuição da ema.
 
 O projeto tem o objetivo de estimar a distribuição da espécie nos municípios do Rio Grande do Sul (RS). Para tanto, utilizaremos 1) dados de detecção e não detecção da ema nos municípios do RS oriundos de diferentes projetos de ciência cidadã (WikiAves, GBIF, E-bird, VertNet, iNaturalist), 2) conhecimento de ornitólogos especialistas, e 3) modelagem da probabilidade de ocupação de sítios (*site-occupancy modeling*) utilizando a integração de dados dos diferentes projetos de ciência cidadã.
 
