@@ -1,5 +1,5 @@
 ---
-title: "Modelagem da distribuição da Ema (*Rhea americana*) no Rio Grande do Sul"
+title: "Modelagem da distribuição da ema (*Rhea americana*) no Rio Grande do Sul"
 author: "André Luza, Arthur V. Rodrigues, Viviane Zulian, Gonçalo Ferraz"
 output: html_document
 ---

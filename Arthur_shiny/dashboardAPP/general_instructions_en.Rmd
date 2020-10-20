@@ -4,7 +4,7 @@ author: "André Luza, Arthur V. Rodrigues, Viviane Zulian, Gonçalo Ferraz"
 output: html_document
 ---
 
-## Modeling the distribution of the Greater Rhea (*Rhea americana*) in Rio Grande do Sul
+## Modeling the distribution of the greater Rhea (*Rhea americana*) in Rio Grande do Sul
 ### André L. Luza, Arthur V. Rodrigues, Viviane Zulian & Gonçalo Ferraz
 
 #### Who are we? What are we doing?
