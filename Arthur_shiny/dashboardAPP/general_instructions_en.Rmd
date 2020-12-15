@@ -10,7 +10,7 @@ output: html_document
 #### Who are we? What are we doing?
 
 We are a team of researchers from the Universidade Federal de Santa Maria (UFSM) and the Universidade Federal do Rio Grande do Sul (UFRGS) interested in using citizen-science data to model the distribution of charismatic and endangered species, such as the vinaceous-breasted amazon (*Amazona vinacea*) and the greater rhea (*Rhea americana*). This is a project focused on greater rhea. 
-The project aims to estimate the distribution of this species across the municipalities of Rio Grande do Sul (RS), the southernmost state of Brazil. We will estimate distribution using 1) detection data from several citizen-science projects (WikiAves, GBIF, E-bird, VertNet, iNaturalist), 2) knowledge of expert ornithologists, and 3) site-occupancy modeling based on the integration of data from citizen-science projects.
+The project aims to map the distribution of this species across the municipalities of Rio Grande do Sul (RS), the southernmost state of Brazil. We will estimate distribution using 1) detection data from several citizen-science projects (WikiAves, GBIF, eBird, VertNet, iNaturalist), 2) knowledge of expert ornithologists, and 3) site-occupancy modeling based on the integration of data from citizen-science projects.
 
 #### What do we want from you?
 

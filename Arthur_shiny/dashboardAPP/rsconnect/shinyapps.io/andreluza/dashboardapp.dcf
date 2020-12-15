@@ -5,6 +5,6 @@ account: andreluza
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2938121
-bundleId: 3762752
+bundleId: 3993739
 url: https://andreluza.shinyapps.io/dashboardapp/
-when: 1603204124.23883
+when: 1608065749.58581
