@@ -1,0 +1,25 @@
+---
+title: "Modelagem da distribuição da ema (*Rhea americana*) no Rio Grande do Sul"
+author: "André Luza, Arthur V. Rodrigues, Viviane Zulian, Gonçalo Ferraz"
+output: html_document
+---
+
+## Modelagem da distribuição da Ema (*Rhea americana*) no Rio Grande do Sul
+### André L. Luza, Arthur V. Rodrigues, Viviane Zulian & Gonçalo Ferraz
+
+#### Quem somos nós? O que estamos fazendo?
+
+Somos um time de pesquisadores da Universidade Federal de Santa Maria (UFSM) e da Universidade Federal do Rio Grande do Sul (UFRGS) interessados em usar dados de ciência cidadã para modelar a distribuição de espécies carismáticas e ameaçadas, como é o caso do papagaio-do-peito-roxo (*Amazona vinacea*) e da ema (*Rhea americana*). Este projeto tem foco na distribuição da ema.
+
+O projeto tem o objetivo de mapear a distribuição da espécie nos municípios do Rio Grande do Sul (RS). Para tanto, utilizaremos 1) dados de detecção e não detecção da ema nos municípios do RS oriundos de diferentes projetos de ciência cidadã (WikiAves, GBIF, eBird, VertNet, iNaturalist), 2) conhecimento de ornitólogos especialistas, e 3) modelagem da probabilidade de ocupação de sítios (*site-occupancy modeling*) utilizando a integração de dados dos diferentes projetos de ciência cidadã.
+
+#### O que nós queremos pedir a você?
+
+Nós já temos os dados dos diferentes projetos de ciência cidadã, e já temos estimativas de distribuição baseada na probabilidade de ocupação de sítios. Agora, nós precisamos de sua ajuda de ornitólogo especialista para obter informações sobre a distribuição da ema com base em observações e experiência a campo. Por isso, lhe convidamos para compartilhar seu conhecimento sobre a distribuição da ema no RS. Para lhe ajudar com esta tarefa, preparamos este aplicativo com dois mapas iterativos. Neles  você pode desenhar um ou mais polígonos delimitando a área que você detectou e/ou que sabe que a ema pode ser detectada. Estes mapas iterativos são: 1) mapa com os limites dos municípios do RS, e 2) mapa com a cobertura de campos dos municípios (de Hofmann et al. 2015). Esperamos que estes mapas lhe auxiliem ao longo do processo de desenho dos polígonos!
+
+Agora que você já conhece as instruções gerais, vá para a guia 'Desenhe a distribuição' no lado direto desta página para começar a desenhar os polígonos de distribuição.
+Ressaltamos que você pode suprimir a guia da esquerda a qualquer momento. Isto pode ser útil para ver mapas em tamanho maior. Para suprimir a barra basta clicar no ícone de três barras sobrepostas, ao lado da escrita *Rhea americana* situada na faixa verde da porção superior desta tela. 
+
+Nossos sinceros cumprimentos,
+
+André, Arthur, Viviane, Gonçalo

@@ -1,0 +1,11 @@
+---
+title: "Map instructions"
+author: "arthur"
+date: "05/10/2020"
+output: html_document
+---
+
+Utilize as ferramentas do mapa para desenhar quantos poligonos forem necessários para descrever seu conhecimento sobre a distribuição de *Rhea americana* no estado do Rio Grande do Sul. 
+
+Utilize a função **Draw a polygon** para começar a desenhar. Passe o mouse sobre o mapa do RS para ver o nome do município. 
+Pelo menos um polígono deve ser desenhado nesse passo inicial. 

@@ -1,0 +1,4 @@
+## deploy the app
+
+library(rsconnect)
+deployApp()
