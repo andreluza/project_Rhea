@@ -16,7 +16,7 @@ The project aims to map the distribution of this species across the municipaliti
 
 We already get data of citizen-science projects, and also have distribution estimates from site-occupancy modeling. Now, we need your help of expert ornithologist to gather information about greater rhea distribution in RS based on fieldwork observation and experience. To help you with that, we set up this application with two iterative maps, where you can draw one or more polygons bounding the localities where you detected and / or know that rhea can be detected. These maps are: 1) map with the boundaries of the municipalities of RS, and 2) map with the cover of natural grasslands per municipality (from Hofmann et al. 2015). We hope that these maps help you!
 
-Now that you already know the general instructions, go to the guide 'Draw the distribution' on the right side of this page to start drawing the distribution polygons.
+Now that you already know the general instructions, go to the guide 'Draw the distribution' on the left side of this page to start drawing the distribution polygons.
 We emphasize that you can delete the left guide at any time. This can be useful for viewing larger maps. To do that just click on the icon of three overlapping bars next to *Rhea americana*, located in the green band at the top of this screen.
 
 Best regards,

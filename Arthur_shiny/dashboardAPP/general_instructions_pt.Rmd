@@ -17,7 +17,7 @@ O projeto tem o objetivo de mapear a distribuição da espécie nos municípios 
 
 Nós já temos os dados dos diferentes projetos de ciência cidadã, e já temos estimativas de distribuição baseada na probabilidade de ocupação de sítios. Agora, nós precisamos de sua ajuda de ornitólogo especialista para obter informações sobre a distribuição da ema com base em observações e experiência a campo. Por isso, lhe convidamos para compartilhar seu conhecimento sobre a distribuição da ema no RS. Para lhe ajudar com esta tarefa, preparamos este aplicativo com dois mapas iterativos. Neles  você pode desenhar um ou mais polígonos delimitando a área que você detectou e/ou que sabe que a ema pode ser detectada. Estes mapas iterativos são: 1) mapa com os limites dos municípios do RS, e 2) mapa com a cobertura de campos dos municípios (de Hofmann et al. 2015). Esperamos que estes mapas lhe auxiliem ao longo do processo de desenho dos polígonos!
 
-Agora que você já conhece as instruções gerais, vá para a guia 'Desenhe a distribuição' no lado direto desta página para começar a desenhar os polígonos de distribuição.
+Agora que você já conhece as instruções gerais, vá para a guia 'Desenhe a distribuição' no lado esquerdo desta página para começar a desenhar os polígonos de distribuição.
 Ressaltamos que você pode suprimir a guia da esquerda a qualquer momento. Isto pode ser útil para ver mapas em tamanho maior. Para suprimir a barra basta clicar no ícone de três barras sobrepostas, ao lado da escrita *Rhea americana* situada na faixa verde da porção superior desta tela. 
 
 Nossos sinceros cumprimentos,
