@@ -23,7 +23,7 @@
 
     # PRIORS
     BETA0 ~ dunif(-10,10)
-    BETA.CAMPO ~ dunif(−10, 10)
+    BETA.CAMPO ~ dunif(-10, 10)
     
     # LIKELIHOOD
     for (i in 1:nsite) {
