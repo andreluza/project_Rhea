@@ -19,6 +19,7 @@ e dois txt com os modelos de integracao de dados
 1-abra o Rproj
 2-abra o script "1_organize_data.R". Este codigo serve somente para chamar outras funcoes para formatar os dados.
 a- ao rodar este codigo, os dados para modelagem vao ser salvos em "data/organized_data", e alguns mapas aparecerao na tela (deteccao e nao deteccao da ema ao longo das fontes de info)
+b- se esse codigo não rodar no (fajuto) R studio, tente no R GUI
 3-abra o script "2_windata_model.R" para ver os modelos e rodar em winbugs. Perceba que no meio tem um lapply, a fim de rodar o mesmo modelo para diferentes tamanho de célula para caracterizar a vizinhanca dos municipios
 
 # implementado até aqui. Logo irei editar o script para coefficient plot & maps

@@ -1,0 +1,210 @@
+
+    model {
+    
+
+    ###################################
+    ###### SPATIAL MODEL  #############
+    ###################################
+
+    # CAR prior - spatial random effect
+
+    for(j in 1:sumNeigh){ # rm isso para o modelo sem espaco
+       weights[j] <- 1
+    }
+
+    # rm isso para o modelo sem espaco
+    spacesigma ~ dunif(0,5)
+    spacetau <- 1/(spacesigma*spacesigma)
+    SPACE [1:nCell] ~ car.normal(adj[],weights[],num[],spacetau)
+    
+    ###################################
+    ###### ECOLOGICAL MODEL ###########
+    ###################################
+
+    # PRIORS
+    BETA0 ~ dunif(-10,10)
+    BETA.CAMPO ~ dunif(-10,10)
+    BETA.AGRI ~ dunif (-10,10)
+    BETA.FENCE  ~ dunif (-10,10) 
+    
+    # LIKELIHOOD
+    for (i in 1:nsite) {
+
+      z[i] ~ dbern(psi[i]) # True occupancy z at site i
+  
+     mu[i] <- BETA0 + BETA.CAMPO * campo[i] +
+                      BETA.AGRI * agri [i] +
+                      BETA.FENCE * cercas [i] +
+                      SPACE [cell.id[i]] 
+
+     mu.lim[i] <- min(10, max(-10, mu[i]))  
+     logit(psi[i]) <- mu.lim[i]
+
+    }    
+
+    ###################################
+    ###### OBSERVATION MODELS #########
+    ###################################
+
+    ### GBIF 
+    
+    #treino - IN
+    for (i in 1:nsiteIN1) {
+
+        e1[i] <- ALPHA.GBIF * nSP.gbif[i]
+        P1[i] <- 1-pow((1-0.5), e1[i])
+        zP1[i] <- P1[i] * z [i]
+        y.gbif [i] ~ dbern(zP1[i])
+
+    }
+    
+    #teste - OUT
+    for (i in 1:nsiteOUT1) {
+
+        e6[i] <- ALPHA.GBIF * nSP.gbif6[i]
+        P6[i] <- 1-pow((1-0.5), e6[i])
+        zP6[i] <- P6[i] * z [i]
+        y.gbif6 [i] ~ dbern(zP6[i])
+
+    }
+
+
+    # PRIOR FOR RICHNESS EFFECT
+    ALPHA.GBIF ~ dnorm(0,0.0001)I(0,1000)# truncated in positive values
+    
+    
+    ### INAT
+    
+    #treino - IN
+    
+    for (i in 1:nsiteIN2) {
+    
+        e3[i] <- ALPHA.INAT * nSP.inat[i]
+        P3[i] <- 1-pow((1-0.5), e3[i])
+        zP3[i] <- P3[i] * z [i]
+        y.inat [i] ~ dbern (zP3[i])
+    
+    }
+    
+    #teste - OUT
+    
+    for (i in 1:nsiteOUT2) {
+    
+        e7[i] <- ALPHA.INAT * nSP.inat7[i]
+        P7[i] <- 1-pow((1-0.5), e7[i])
+        zP7[i] <- P7[i] * z [i]
+        y.inat7 [i] ~ dbern (zP7[i])
+    
+    }
+    
+    # PRIOR FOR RICHNESS EFFECT
+    ALPHA.INAT ~ dnorm(0,0.0001)I(0,1000)# truncated in positive values
+    
+    ### VERTNET
+    
+    #treino IN
+    
+    for (i in 1:nsiteIN3) {
+    
+        e4[i] <- ALPHA.INAT * nSP.vertnet[i]
+        P4[i] <- 1-pow((1-0.5), e4[i])
+        zP4[i] <- P4[i] * z [i]
+        y.vertnet [i] ~ dbern(zP4[i])
+    
+    }
+  
+    #teste OUT
+    
+    for (i in 1:nsiteOUT3) {
+    
+        e8[i] <- ALPHA.INAT * nSP.vertnet8[i]
+        P8[i] <- 1-pow((1-0.5), e8[i])
+        zP8[i] <- P8[i] * z [i]
+        y.vertnet8 [i] ~ dbern(zP8[i])
+    
+    }
+    
+    # PRIOR FOR RICHNESS EFFECT
+    ALPHA.VERTNET ~ dnorm(0,0.0001)I(0,1000)# truncated in positive values
+    
+    ### WIKIAVES
+    #treino IN:
+    
+    for (i in 1:nsiteIN4) {
+    
+        e5[i] <- ALPHA.PICT * nPIC.wikiaves[i]+ALPHA.SONG*nSONG.wikiaves[i]
+        P5[i] <- 1-pow((1-0.5), e5[i])
+        zP5[i] <- P5[i] * z [i]
+        y.wikiaves[i] ~ dbern(zP5[i])#+(1-zP5[i])*q[i])
+        
+    }
+    
+    #teste OUT:
+    
+    for (i in 1:nsiteOUT4) {
+    
+        e9[i] <- ALPHA.PICT * nPIC.wikiaves9[i]+ALPHA.SONG*nSONG.wikiaves9[i]
+        P9[i] <- 1-pow((1-0.5), e9[i])
+        zP9[i] <- P9[i] * z [i]
+        y.wikiaves9[i] ~ dbern(zP9[i])#+(1-zP9[i])*q[i])
+        
+    }
+    
+    # PRIOR FOR RICHNESS EFFECT
+    ALPHA.PICT ~ dnorm(0,0.0001)I(0,30000)# truncated in positive values
+    ALPHA.SONG ~ dnorm(0,0.0001)I(0,10000)# truncated in positive values
+  
+  
+  
+  ## EBIRD
+  
+    for (i in 1:nsiteIN5) {
+      for (j in 1:nrepEBin) {
+
+        e2[i,j] <- ALPHA.DIST * dist[i,j] +
+                   ALPHA.DURATION * duration[i,j] +
+                   ALPHA.OBSERVER * observer[i,j]
+ 
+        P2[i,j] <- 1-pow((1-0.5), e2[i,j])
+        zP2[i,j] <- P2[i,j] * z [i]
+        yEB [i,j] ~ dbern(zP2[i,j])
+
+      }
+    }
+    
+    for (i in 1:nsiteOUT5) {
+      for (j in 1:nrepEBout) {
+
+        e10[i,j] <- ALPHA.DIST * dist10[i,j] +
+                   ALPHA.DURATION * duration10[i,j] +
+                   ALPHA.OBSERVER * observer10[i,j]
+ 
+        P10[i,j] <- 1-pow((1-0.5), e10[i,j])
+        zP10[i,j] <- P10[i,j] * z [i]
+        yEB10 [i,j] ~ dbern(zP10[i,j])
+
+      }
+    }
+    
+    ALPHA.DIST ~ dnorm(0,0.0001)I(0,1000)
+    ALPHA.DURATION ~ dnorm(0,0.0001)I(0,2000)
+    ALPHA.OBSERVER  ~ dnorm(0,0.0001)I(0,1000)
+
+    
+    ##############################
+    #### DERIVED PARAMETERS ######
+    ##############################
+    
+    #compute the mean detection probability of each dataset: 
+    muP1 <- mean(P1[])
+    muP2 <- mean(P2[,])
+    muP3 <- mean(P3[])
+    muP4 <- mean(P4[])
+    muP5 <- mean(P5[])
+
+    ## Number of occupied municipalities (finite sample size)
+    fs.z <- sum(z[])/nsite
+    
+
+    }## end of the model
+    
