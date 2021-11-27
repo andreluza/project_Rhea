@@ -1,11 +1,9 @@
 
-require (here) # para transitar entre pastas
-require(vegan) # para padronizar os dados
-library(R2WinBUGS) # para rodar o modelo 
-
-
 # -----------------------
-#### Comparando performance de diferentes modelos ####
+# Comparing models
+# -------------------------------------------------
+# load packages
+source ("R/packages.R")
 
 load(here("output", "out_null_model1.RData"))
 load(here("output", "out_model2.RData"))
