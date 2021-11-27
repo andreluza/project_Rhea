@@ -1,16 +1,17 @@
-## mapping
+# -----------------
+## mapping & analysis
 
-## pacote para readOGR
-require(rgdal)
-require(raster)
-require(here)
+# load packages
+source ("R/packages.R")
+
+# shapefile RS 
 shape_RS <- readOGR(dsn=here("data","shape_munRS"), 
                     layer="43MUE250GC_SIR",
                     encoding = "UTF-8",use_iconv = T)
 
-## obter os lagos para pintar diferente depois
+## lakes (will use them when mapping)
 lagos <- shape_RS [c(96,250),]
-## remover os lagos
+## remove lakes
 shape_RS <- shape_RS [-c(96,250),]
 
 ## shape south america
@@ -18,16 +19,13 @@ southAme<- readOGR(dsn=here ("data","South_America"),encoding="latin1", layer="S
 BR_AR_URU<- southAme [southAme@data$COUNTRY == "Paraguay" | southAme@data$COUNTRY == "Brazil" | southAme@data$COUNTRY == "Argentina" | southAme@data$COUNTRY == "Uruguay", ]
 crs(BR_AR_URU)<-crs(shape_RS)
 
-
 ## load Pampa shapefile useful for maps and other stuff
 pampa <- readOGR(dsn=here("data","pampa_border"), 
                     layer="biome_border",
                     encoding = "UTF-8",use_iconv = T)
 crs(pampa)<-crs(shape_RS)
 
-## carregar os resultados dos modelos
-require(jagsUI)
-require(R2WinBUGS)
+## load models
 list.res <- list.files (here("output"), pattern = "out_*")
 
 load(here("output", "out_null_model1.RData"))
@@ -37,7 +35,7 @@ load(here("output", "out_grass_agri_model4.RData"))
 load(here("output", "out_model5.RData"))
 load(here("output", "out_complete_model6.RData"))
 
-# load validation data
+# load validation data (for model selection)
 load(here("output", "validation_data.RData"))
 n_so_ebird<-11
 #list modeels
@@ -86,18 +84,16 @@ corrplot(cor(do.call(cbind,lapply (res_occ_models, function (i) i$mean$z))),
 
 
 #----------------------------------------- #
-# mapa do best ranked model
-## neighborhood of 10 km
-
+# map best ranked model
 load(here ("output","sampled.RData"))
 load(here("data","organized_data", "INPUT_ebird.RData")) ## ebird
 
-# dados para reodenar os municipios apos output
+# reordering of municipalities
 treino <- which(ID_MUN$ID_MUN %in% sampled$ID_MUN == F) 
 teste <- which(ID_MUN$ID_MUN %in% sampled$ID_MUN == T) 
 teste_ordem <- c(treino,teste)
 
-# data frame, reodenadno os municipios
+# data frame, reordered
 cores_50km <- data.frame (cores= res_occ_models$spatial50$mean$z [order(teste_ordem, decreasing=F)] ,
                      NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -107,15 +103,15 @@ f.mun<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_50km<- cbind (f.mun, 
                Nespecies= cores_50km [match (f.mun$id, cores_50km$NM_MUNICIP),]$cores)
 
-## colocar o shape da america do sul = comum a todos
+## plot south america shapefile
 a <- ggplot() + geom_polygon (data=BR_AR_URU, aes(x=long, y=lat, group=group),size = 0.1, fill="gray90", colour="gray75",alpha=1) +
   coord_fixed (xlim = c(-57.5, -49),  ylim = c(-34, -27), ratio = 1) 
 
-## inserir os lagos = comum a todos
+## plot lakes
 b <- a + geom_polygon (data=lagos,aes(x=long, y=lat, group=group), 
                                   fill="lightcyan",colour = "lightcyan", size=1)
 
-## inserir estimativas
+## insert estimates
 c_50km <-   b + geom_polygon(data=f.mun_50km, aes(x=long, y=lat, group=group, 
                                         color=Nespecies, fill=Nespecies), colour = NA, size=1) + 
   labs (title= "Species distribution modeling (SDM)")+
@@ -186,7 +182,7 @@ f_50km_legend <- f_50km_legend + ggsn::north(f.mun_50km, symbol=1,scale = 0.2,lo
 
 
 # --------------------------------------------- #
-#             MAPAS DOS EXPERTS
+#             MAP of EXPERTS
 
 files_expert <- list.files(here ("data", "expert_opinion"),pattern=".rds")
 
@@ -206,17 +202,18 @@ expert_rhea<- ifelse(is.na(expert_rhea),0,1)
 # summing and getting presence
 expert_rhea_presence <- ifelse (rowSums (expert_rhea)>1,1,0)
 
-## osbrepor o expert com mapa do RS
+## over expert and RS maps
 cores_expert <- data.frame (cores= expert_rhea_presence,
                             NM_MUNICIP=shape_RS$NM_MUNICIP)
 sum(cores_expert$cores)
 
 # fortify 
+f.mun<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_expert <- cbind (f.mun, 
                        Nespecies= cores_expert [match (f.mun$id, 
                                                        cores_expert$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## insert expert data
 c_expert <-   b + geom_polygon(data=f.mun_expert, aes(x=long, y=lat, group=group, 
                                                       color=Nespecies, fill=Nespecies), 
                                colour = NA, size=1) + 
@@ -248,7 +245,6 @@ f_expert <- c_expert +
         plot.margin = unit(c(-4,0, -0.5, 0), "lines"))
 # top, right, bottom, and left margins
 
-
 #g_expert <- f_expert + annotate(geom="text", x=-56, y=-32, label="URUGUAI",color="black",size=2.1) +
 #  annotate(geom="text", x=-56.5, y=-27.8, label="ARGENTINA",color="black",size=2.1)+
 #  annotate(geom="text", x=-56.5, y=-27, label="PARAGUAI",color="black",size=2.1)+
@@ -270,9 +266,7 @@ i_expert<- f_expert + geom_polygon (data=pampa,aes(x=long, y=lat, group=group),
 
 i_expert
 
-
 # plot ber biome
-# municipios dentro do pampa
 pampa_mun <- over (shape_RS, pampa)
 pampa_mun$ID <- ifelse (pampa_mun$ID ==1, "Pampa", "Atlantic Forest")
 pampa_mun$ID[is.na(pampa_mun$ID)] <- "Atlantic Forest"
@@ -288,11 +282,8 @@ expert$data <- "Expert"
 # bind these data
 pampa_mun<- rbind (pampa_mun,
                    expert)
-
 pampa_mun[which(pampa_mun$ID == "Pampa" & pampa_mun$data == "Expert"), "z"]
-
 pampa_mun[which(pampa_mun$ID == "Pampa"), "z"]
-
 
 # difference
 summary(aov(pampa_mun$z~pampa_mun$ID*pampa_mun$data))
@@ -926,7 +917,7 @@ dev.off()
 # supporting information
 
 # ------------------------------------------------------------------------------
-# the other map
+# the other exertp map (Fig S1.1)
 files_expert <- list.files(here ("data", "expert_opinion"),pattern=".rds")
 
 ## expert data
@@ -1008,7 +999,9 @@ i_expert<- f_expert + geom_polygon (data=pampa,aes(x=long, y=lat, group=group),
                                     size=1,
                                     linetype = "dashed")
 
+pdf(here ("output","FigS1-1.pdf"),width=7,height=7)
 i_expert
+dev.off()
 
 # ----------------------------------------------------------------- #
 ## avestruz
@@ -1035,7 +1028,7 @@ c_avestruz <-   b + geom_polygon(data=f.mun_avestruz, aes(x=long, y=lat, group=g
   scale_fill_gradient2 (low='white', high='darkred', #midpoint= 0.20,
                         na.value = "gray85",
                         limits=c(0,1), 
-                        #breaks=seq(0,max(cores_50km$cores,na.rm=T),by=0.2),
+                        breaks=seq(0,max(cores_avestruz$cores,na.rm=T),by=1),
                         name="Detected") ## para continuo
 
 f_avestruz <- c_avestruz +
@@ -1048,9 +1041,9 @@ f_avestruz <- c_avestruz +
                                         size = 0.5, 
                                         linetype = "solid"),
         plot.title = element_text(size=9),
-        legend.title = element_blank(),
-        legend.text = element_blank(),
-        legend.position = "none",
+        #legend.title = element_blank(),
+        #legend.text = element_blank(),
+        #legend.position = "none",
         axis.text=element_text(size=3),
         axis.text.x = element_blank(),
         axis.title.x = element_text(size = 4),
@@ -1060,8 +1053,9 @@ f_avestruz <- c_avestruz +
         plot.margin = unit(c(-4,0, -0.5, 0), "lines"))
 # top, right, bottom, and left margins
 
-
-
+pdf(here ("output","avestruz.pdf"),width=7,height=7)
+f_avestruz
+dev.off()
 
 # garbage
 
