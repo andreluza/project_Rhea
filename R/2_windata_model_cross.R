@@ -1,15 +1,10 @@
 # -------------------------------------------------
-# run model
+# load packages
+source ("R/packages.R")
 
 #---------------------
-# Detection and observation data
+# load Detection and observation data
 #---------------------
-
-require (here) # para transitar entre pastas
-require(vegan) # para padronizar os dados
-library(R2WinBUGS) # para rodar o modelo 
-
-# load data
 load(here("data","organized_data", "input_GBIF.RData")) ## gbif
 load(here("data","organized_data", "input_INAT.RData")) ## inat
 load(here("data","organized_data", "input_VERTNET.RData")) ## vertnet
@@ -17,57 +12,47 @@ load(here("data","organized_data", "INPUT_ebird.RData")) ## ebird
 load(here("data","organized_data", "input_wikiaves.RData")) # wikiaves
 
 #-------------------------
-# carregar dados espaciais
+# load spatial data
 #--------------------------
+load(here ("data","geo","shapeRS_lambert.RData")) # shapefile of Rio Grande do Sul
+area_mun <- gArea (shape_RS,byid=T)/1000.00## municipality_area, km
+## check areas here file:///C:/Users/topoa/Downloads/Ranking_RS_2009-2010_Alfabetico.pdf
+area_mun [which(shape_RS$NM_MUNICIP == "AMARAL FERRADOR")] # match
 
-# carregar shapefile RS
-require(rgdal)
-require(raster)
-require(rgeos)
-
-load(here ("data","geo","shapeRS_lambert.RData"))
-
-## municipality_area, km
-area_mun <- gArea (shape_RS,byid=T)/1000.00
-## CONFERIR AQUI file:///C:/Users/topoa/Downloads/Ranking_RS_2009-2010_Alfabetico.pdf
-area_mun [which(shape_RS$NM_MUNICIP == "AMARAL FERRADOR")]
-
-#----------------------------
-# covariaveis de sitio (municipio)
-#----------------------------
-
+#-------------------------------
+# site covariates (municipality)
+#-------------------------------
 load(here("data","organized_data", "dados_covariaveis.RData"))
 
-# agreggate grassland data
+# aggregate grassland data
 campo <- usos_tabela$`Campo seco.area` + 
                       usos_tabela$`Campo umido.area` +
                       usos_tabela$`Campo de feixe de restinga.area`+
                       usos_tabela$`Campo em regeneracao.area`
-# agicultura
+# agriculture
 agricultura_uso <- usos_tabela$`Agricultura de sequeiro.area`
 
+# Number of properties per municipality
+cercas <- numero_estabelecimentos_lavoura$Total # proxy for fence
 
-# cercas
+# correlation between covariates is low
+cor(data.frame(cercas, campo, agricultura_uso))
+# check municipality order
+# numero_estabelecimentos_lavoura$X == rownames(usos_tabela)
 
-cercas<-numero_estabelecimentos_lavoura$Total
-
-cor(cercas,
-    campo)
-cor(cercas,
-    agricultura_uso)
-
-### padronizacoes
-## area de habitat campestre e florestal por municipio
-## multiplicar a cobertura de habitat pela area do municipio
+### Standardize covariates
+## grassland area/agriculture/N properties per municipality
+## grassland cover * municipality area
 area_campo <- area_mun*campo
 habitat_campo <- area_mun*campo
 area_lavoura <- area_mun*agricultura_uso
 habitat_lavoura <- area_mun*agricultura_uso
+propriedades_relativo_area <- cercas/area_mun
 
 ## raiz quadrada, e entao padronizar pela media e sd
 habitat_campo <- decostand (sqrt(habitat_campo),"standardize")
 habitat_lavoura <- decostand (sqrt(habitat_lavoura),"standardize")
-cercas_std <- decostand (sqrt(cercas),"standardize")
+cercas_std <- decostand ((propriedades_relativo_area),"standardize")
 
 # creaste a folder to host output
 dir.create('output')
@@ -77,14 +62,13 @@ shape_RS@data$campo <- area_campo
 # plot
 cores_sem <- data.frame (cores= sqrt(area_campo),
                          NM_MUNICIP=shape_RS$NM_MUNICIP)
-
-require(ggplot2)
+# data for mapping
 f.mun_sem<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_sem<- cbind (f.mun_sem, 
                    Nespecies= cores_sem [match (f.mun_sem$id, cores_sem$NM_MUNICIP),]$cores)
 
 # grassland
-## inserir vals
+## insert vals
 c_campo <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=group, 
                                                 color=Nespecies, fill=Nespecies), colour = NA, size=1) + 
   labs (title= "Grassland area, per municipality") +
@@ -108,13 +92,12 @@ shape_RS@data$agricultura <- area_lavoura
 cores_sem <- data.frame (cores= sqrt(area_lavoura),
                          NM_MUNICIP=shape_RS$NM_MUNICIP)
 
-require(ggplot2)
-require(gridExtra)
+# data for map
 f.mun_sem<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_sem<- cbind (f.mun_sem, 
                    Nespecies= cores_sem [match (f.mun_sem$id, cores_sem$NM_MUNICIP),]$cores)
 
-## inserir vals
+## insert vals
 c_agri <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=group, 
                                                        color=Nespecies, fill=Nespecies), 
                                    colour = NA, size=1) + 
@@ -134,18 +117,18 @@ c_agri <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=gro
 
 # cercas
 # bind numerb of rural properties data into the shape
-shape_RS@data$cercas <- cercas
+shape_RS@data$cercas <- propriedades_relativo_area
+
 # plot
-cores_sem <- data.frame (cores= sqrt(cercas),
+cores_sem <- data.frame (cores= (propriedades_relativo_area),
                          NM_MUNICIP=shape_RS$NM_MUNICIP)
 
-require(ggplot2)
-require(gridExtra)
+# data
 f.mun_sem<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_sem<- cbind (f.mun_sem, 
                    Nespecies= cores_sem [match (f.mun_sem$id, cores_sem$NM_MUNICIP),]$cores)
 
-## inserir vals
+## insert vals
 c_cercas <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=group, 
                                                         color=Nespecies, fill=Nespecies), 
                                     colour = NA, size=1) + 
@@ -153,8 +136,8 @@ c_cercas <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=g
   scale_fill_gradient2 (low='white', high='blue', na.value = "white",
                         limits=c(0,max(cores_sem$cores)), 
                         breaks=seq(0,max(cores_sem$cores,na.rm=T),
-                                   by=30),
-                        name=expression(sqrt("# properties"))) ## para continuo
+                                   by=0.01),
+                        name=expression(("# properties/area"))) ## para continuo
 
 (c_cercas<-c_cercas + theme_classic() + 
     theme (axis.text = element_text(size=6),
@@ -166,7 +149,7 @@ c_cercas <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=g
 
 
 # bind maps and save
-pdf (here ("output", "maps_land_use.pdf"),heigh=11,width=5)
+pdf (here ("output", "FigS1-3.pdf"),heigh=11,width=5)
 grid.arrange(c_campo,
              c_agri,
              c_cercas)
@@ -197,12 +180,14 @@ n_so_ebird <- round (mean(unlist(
   )
   )
 
+pdf (here ("output", "FigS1-2.pdf"),height=5,width=5)
 # histograma
 hist(unlist(
   lapply (seq(1,nrow(y.ebird)), function (i) 
     sum(is.na(y.ebird[i,])!=T))),
   xlab="Number of checklists",main="")
 abline(v=n_so_ebird,lwd=2)
+dev.off()
 
 # ----------------------------------------
 # formating data to the models
@@ -267,8 +252,7 @@ inits = function() {list(z = rep (1, nrow(y.ebird)),
 
 
 # ------------------------------------- #
-# without space and without grasslnads
-
+# null model without space and without grasslands
 # create a folder to host bugs code
 dir.create("bugs_code")
       
