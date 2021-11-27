@@ -1,9 +1,21 @@
-library(shiny)
-library(leaflet)
-library(leaflet.extras)
-library(rgdal)
-library (rgdal)
-require(sp)
+# going through the folders
+require (here) 
+
+# standardization
+require(vegan) 
+
+# models
+library(R2WinBUGS) 
+require(jagsUI)
+
+# space
+require(rgdal)
 require(raster)
-require(here)
-require(sendmailR)
+require(rgeos)
+
+# plots, mapps, arrays
+require(ggplot2)
+require(gridExtra)
+
+
+
