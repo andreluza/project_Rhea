@@ -60,7 +60,7 @@ load(here("output","deviance.RData"))
 z_per_model<-cbind (
   do.call (rbind, lapply (res_occ_models, function (i) 
     i$summary[grep("fs.z", rownames(i$summary)),])),
-  
+  # last column, sd z
   do.call (rbind, lapply (res_occ_models, function (i) 
     sd(i$mean$z)))
 )
