@@ -1,0 +1,25 @@
+Este projeto tem as seguintes pastas:
+
+"Arthur_shiny", com os códigos R e shiny para criar a webpage dedicada a coleta de informações de ornitologistas experts
+"bugs", com alguns códigos em linguagem BUGS
+"data", como todos os dados, desde deteccoes de Rhea em cada base de dados, covariaveis ambientais, dados espaciais (rasters, shapefiles), e também codigos R para extrair a informacao das diferentes fontes
+"output", com os resultados dos modelos
+"R", principais codigos de R necessarios para executar o projeto
+"referencias_MS", algumas referencias e o texto do MS
+
+# alguns arquivos tb
+
+gitignore = arquivo do github
+project_Rhea = Rproj deste projeto
+
+e dois txt com os modelos de integracao de dados
+
+# ------------------------------ #
+# instrucoes para chegar aos resultados
+1-abra o Rproj
+2-abra o script "1_organize_data.R". Este codigo serve somente para chamar outras funcoes para formatar os dados.
+a- ao rodar este codigo, os dados para modelagem vao ser salvos em "data/organized_data", e alguns mapas aparecerao na tela (deteccao e nao deteccao da ema ao longo das fontes de info)
+b- se esse codigo não rodar no (fajuto) R studio, tente no R GUI
+3-abra o script "2_windata_model.R" para ver os modelos e rodar em winbugs. Perceba que no meio tem um lapply, a fim de rodar o mesmo modelo para diferentes tamanho de célula para caracterizar a vizinhanca dos municipios
+
+# implementado até aqui. Logo irei editar o script para coefficient plot & maps
