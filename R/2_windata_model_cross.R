@@ -1891,3 +1891,95 @@ out_complete_model6  <- lapply (seq (1,3), function (i) {# length(adj)
 
 # save it
 save (out_complete_model6,file=here("output", "out_complete_model6.RData"))
+
+
+
+# -----------------------
+#### Comparando performance de diferentes modelos ####
+
+model_list <- list(null=out_null_model1,
+                   spatial10=out_model2[[1]],
+                  spatial25=out_model2[[2]],
+                  grass=out_grass_model3,
+                  grass_agri=out_grass_agri_model4,
+                  grass_aut10 = out_model5[[1]],
+                  grass_aut25 = out_model5[[2]],
+                  complete10 = out_complete_model6[[1]],
+                  complete25 = out_complete_model6[[2]]
+                  )
+
+# roc curve
+# deviance
+require(pROC)
+model_sel <- lapply (model_list, function (i) {
+      
+      ## 1) Calcular a Deviance
+      # separar os dados observados (teste) - GBIF
+      Ytruth <- datGBOut[,"det"]
+      # separar os dados preditos/estimados pelo modelo - GBIF
+      Yhat <- i$mean$y.gbif6
+      
+      # separar os dados observados (teste) - Wikiaves
+      Ytruth2 <- datWAOut[, "RHAMERICANA"]
+      # separar os dados preditos/estimados pelo modelo - Wikiaves
+      Yhat2 <- i$mean$y.wikiaves9
+      
+      # separar os dados observados (teste) - eBird
+      Ytruth3 <- datEBOut[,1:n_so_ebird]
+      # separar os dados preditos/estimados pelo modelo - eBird
+      Yhat3 <- i$mean$yEB10
+      
+      ## Deviance em cada base de dados:
+      # GBIF
+      likhood <- (Yhat^Ytruth)*((1-Yhat)^(1-Ytruth))
+      DEV <- -(2*(sum(log(likhood))))
+      
+      # Wikiaves
+      likhood2 <- (Yhat2^Ytruth2)*((1-Yhat2)^(1-Ytruth2))
+      lokLik2<- log(likhood2)
+      lokLik2 <- lokLik2[is.infinite(lokLik2) == F]
+      DEV2 <- -(2*(sum(lokLik2)))
+      
+      # eBird
+      likhood3 <- (Yhat3^Ytruth3)*((1-Yhat3)^(1-Ytruth3))
+      lokLik3<- log(likhood3)
+      lokLik3 <- lokLik3[is.na(lokLik3) == F]
+      DEV3 <- -(2*(sum(lokLik3)))
+      
+	# Deviance total:
+      DEVtotal <- DEV + DEV2 + DEV3  # valor que deve ser comparado entre modelos.
+      # modelo com o menor valor de deviance tem 
+      # o melhor ajuste aos dados.
+      
+      # ROC
+      # gbif
+      roc_res <- data.frame (gbif = roc(Ytruth, Yhat)$auc,
+                             wikiaves = roc(Ytruth2, Yhat2)$auc,
+                             ebird = roc(as.numeric(Ytruth3), as.numeric(Yhat3))$auc)
+                             
+      # list of results
+      res<-list (roc = roc_res,
+            deviance= round(DEVtotal,2))
+      ;
+      res
+})
+
+## 2) Plotar curvas AUC
+
+deviance_sel <- sapply (model_sel,"[[","deviance")
+save(deviance_sel,file=here ("output_sensitivity","deviance.RData"))
+
+# plot GBIF
+plot(roc(Ytruth, Yhat), main = "Full Model")
+mtext(text = paste ("AUC=",round (roc(estpred[,1], estpred[,2])$auc,2)), side=1)
+# plot WikiAves
+plot(roc(Ytruth2, Yhat2), main = "Full Model")
+mtext(text = paste ("AUC=",round (roc(Ytruth2, Yhat2)$auc,2)), side=1)
+
+# plot eBird
+plot(roc(as.numeric(Ytruth3), as.numeric(Yhat3)), main = "Full Model")
+mtext(text = paste ("AUC=",round (roc(as.numeric(Ytruth3), as.numeric(Yhat3))$auc,2)), side=1)
+
+
+rm(list=ls())
+
