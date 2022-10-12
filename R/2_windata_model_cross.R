@@ -991,7 +991,6 @@ cat("
     ",fill = TRUE)
 sink()
 
-
 # bound data
 str(win.data <- list(nsite = dim(dados_det_ema_gbif)[1],
                      y.gbif = datGBIn[,"det"],
