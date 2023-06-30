@@ -10,19 +10,19 @@ par(mfrow=c(3,2),mar=c(0,0,1,1))
 source("data/expert_opinion/expert.R")
 
 # run code to organize and save GBif data
-source("data/deteccoes/Gbif/codigos.R")
+source("data/deteccoes/Gbif/codes_GBIF.R")
 
 # run code to organize and save Inaturalist data
-source("data/deteccoes/outras_bases_INAT/codigos.R") 
+source("data/deteccoes/outras_bases_INAT/codes_iNaturalist.R") 
 
 # run code to organize and save vertnet data
-source("data/deteccoes/vertnet/extract_vertnet_data.R")
+source("data/deteccoes/vertnet/codes_VertNet.R")
 
 # run code to organize and save wikiaves data
-source("data/deteccoes/wikiaves/codigos_wiki.R")
+source("data/deteccoes/wikiaves/codes_wikiAves.R")
 
 # run code to organize and save EBird data
-source("data/deteccoes/ebird/codigos_ebird.R")
+source("data/deteccoes/ebird/codes_eBird.R")
 
 # -------------------------------------------------
 # site and spatial covariates
