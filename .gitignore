@@ -14,3 +14,6 @@ bugs_sen
 output_sensitivity
 *sensitivity.R
 *.pptx
+R/Copy*.R
+R/*sensitivity.R
+R/*codigos.R
