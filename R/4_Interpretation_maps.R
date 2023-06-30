@@ -121,7 +121,7 @@ c_50km <-   b + geom_polygon(data=f.mun_50km, aes(x=long, y=lat, group=group,
                         na.value = "white",
                         limits=c(0,max(cores_50km$cores)), 
                         breaks=seq(0,max(cores_50km$cores,na.rm=T),by=0.2),
-                        name=expression("z" [i])) ## para continuo
+                        name=expression("z" [i])) ## 
   
 
 d_50km <- c_50km + annotate(geom="text", x=-56, y=-32, label="URUGUAY",color="black",size=2.3) +
@@ -434,9 +434,9 @@ diferenca <- data.frame (exp=(cores_expert$cores),
                          sdm=cores_50km$cores,
                          diff=cores_expert$cores - cores_50km$cores)
 
-t(data.frame ('Only expert' = table (diferenca$diff > 0)[2], # perito
-              'Agreement betweeen expert and SDM' = table (diferenca$diff == 0)[2], # concordam
-              'Only SDM' = table (diferenca$diff < 0)[2]) # perito
+t(data.frame ('Only expert' = table (diferenca$diff > 0)[2], # expert
+              'Agreement betweeen expert and SDM' = table (diferenca$diff == 0)[2], # agreed
+              'Only SDM' = table (diferenca$diff < 0)[2]) # expert
 )
 
 
@@ -520,10 +520,10 @@ dev.off()
 
 
 # ----------------------------------------
-# MAPA da INCERTEZA
+# Uncertainty map
 # -----------------------------------------
 
-# data frame, reodenadno os municipios
+# data frame, reordering municipalities
 cores_incerteza <- data.frame (cores= res_occ_models$spatial50$sd$psi [order(teste_ordem, decreasing=F)] ,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -533,7 +533,7 @@ f.mun_incerteza<- cbind (f.mun,
                     Nespecies= cores_incerteza [match (f.mun$id, cores_incerteza$NM_MUNICIP),]$cores)
 f.mun_incerteza$Nespecies <- round(f.mun_incerteza$Nespecies ,3)
 
-## inserir estimativas
+## bind estimates
 c_incerteza <-   b + geom_polygon(data=f.mun_incerteza, aes(x=long, y=lat, group=group, 
                                                   color=round(Nespecies,2), 
 								 fill=round(Nespecies,2)), 
@@ -556,7 +556,7 @@ e_incerteza <- d_incerteza + ggsn::scalebar(f.mun_incerteza, dist = 100, st.dist
                                   transform = TRUE, dist_unit = "km",
                                   model = 'WGS84', location = "bottomright")
 
-## plot para retirar a legenda
+## plot and extract legend
 
 f_incerteza <- e_incerteza +
   xlab("Longitude") + ylab("Latitude") +
@@ -596,25 +596,25 @@ dev.off()
 
 
 # -----------------------------------------
-#         MAPAS DAS OBSERVACOES
+#         MAP OF OBSERVATIONS	
 # -----------------------------------------
 require(ggplot2)
 f.mun<-fortify(shape_RS, region="NM_MUNICIP")
 
-## colocar o shape da america do sul = comum a todos
+## SOUTH AMERICA SHAPEFILE
 a <- ggplot() + geom_polygon (data=BR_AR_URU, aes(x=long, y=lat, group=group),size = 0.1, fill="gray90", colour="gray75",alpha=1) +
   coord_fixed (xlim = c(-57.5, -49),  ylim = c(-34, -27), ratio = 1) 
 
-## inserir os lagos = comum a todos
+## LAKES
 b <- a + geom_polygon (data=lagos,aes(x=long, y=lat, group=group), 
                        fill="lightcyan",colour = "lightcyan", size=1)
 
-## abrir deteccoes do ebird
+## ebird detections
 
 load (here("data","deteccoes", "ebird", "INPUT_ebird.RData"))## gbif
 ebird_rhea <- apply (df_mun_rhea, 1, max,na.rm=T)
 
-## mapas das deteccoes
+## map of detections
 cores_ebird <- data.frame (cores= ebird_rhea,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -628,7 +628,7 @@ f.mun_ebird<- cbind (f.mun,
                     Nespecies= cores_ebird [match (f.mun$id, 
                                                   cores_ebird$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## detectins GBIF
 c_ebird <-   b + geom_polygon(data=f.mun_ebird, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                                colour=NA,size=1) + 
@@ -649,7 +649,7 @@ e_ebird <- d_ebird + ggsn::scalebar(f.mun_ebird, dist = 100, st.dist=0.03,st.siz
                                   transform = TRUE, dist_unit = "km",
                                   model = 'WGS84', location = "bottomright")
 
-## plot para retirar a legenda
+## plot and legend
 
 f_ebird_legend <- e_ebird +
   xlab("Longitude") + ylab("Latitude") +
@@ -681,7 +681,7 @@ f_ebird_legend <- e_ebird +
 
 f_ebird_legend
 
-## extrair legenda
+## extract legend
 require(gridExtra)
 get_legend<-function(myggplot){
   tmp <- ggplot_gtable(ggplot_build(myggplot))
@@ -690,9 +690,9 @@ get_legend<-function(myggplot){
   return(legend)
 }
 
-legenda_comum_data <- get_legend(f_ebird_legend) ## tem que primeiro gerar um mapa com legenda
+legenda_comum_data <- get_legend(f_ebird_legend) ## get legend 
 
-## plot para o painel (sem a legenda)  
+## remove legend
 f_ebird <- e_ebird + 
   xlab("Longitude") + ylab("Latitude") +
   theme(panel.border = element_blank(), 
@@ -722,10 +722,10 @@ f_north_ebird <- f_ebird + ggsn::north(f.mun_ebird, symbol=1,scale = 0.2,locatio
 
 f_north_ebird
 
-## abrir deteccoes GIBF
+## gbif detections
 load (here("data","deteccoes", "Gbif", "input_GBIF.RData"))## gbif
 
-## mapas das deteccoes
+## map detections
 cores_gbif <- data.frame (cores= dados_det_ema_gbif$det,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -736,7 +736,7 @@ f.mun_gbif<- cbind (f.mun,
                     Nespecies= cores_gbif [match (f.mun$id, 
                                                   cores_gbif$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## GBIF detections
 c_gbif <-   b + geom_polygon(data=f.mun_gbif, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -770,10 +770,10 @@ f_gbif <- c_gbif +
 # top, right, bottom, and left margins
 
 
-## abrir deteccoes wikiaves
+##  wikiaves detections
 load (here("data","deteccoes", "wikiaves", "input_wikiaves.RData"))## gbif
 
-## mapas das deteccoes
+## map of detections
 cores_wiki <- data.frame (cores= dados_wikiaves$RHAMERICANA,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -784,7 +784,7 @@ f.mun_wiki <- cbind (f.mun,
                     Nespecies= cores_wiki [match (f.mun$id, 
                                                   cores_wiki$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## bind detetions
 c_wiki <-   b + geom_polygon(data=f.mun_wiki, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -818,10 +818,10 @@ f_wiki <- c_wiki +
 
 f_wiki
 
-## abrir deteccoes INAT
+##INAT detections
 load (here("data","deteccoes", "outras_bases_INAT", "input_INAT.RData"))## gbif
 
-## mapas das deteccoes
+## map
 cores_inat <- data.frame (cores= dados_det_ema_inat$det,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -832,7 +832,7 @@ f.mun_inat <- cbind (f.mun,
                      Nespecies= cores_inat [match (f.mun$id, 
                                                    cores_inat$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do INAT
+## plot
 c_inat <-   b + geom_polygon(data=f.mun_inat, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -863,10 +863,10 @@ f_inat<- c_inat +
         plot.margin = unit(c(-3.7,-0.1, 0.2, 0), "lines"))
 # top, right, bottom, and left margins
 
-## carregar vertnet
+## vertnet detections
 load (here("data","deteccoes", "vertnet", "input_VERTNET.RData"))## gbif
 
-## mapas das deteccoes
+## map
 cores_vertnet <- data.frame (cores= dados_det_ema_vertnet$det,
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
@@ -877,7 +877,7 @@ f.mun_vertnet <- cbind (f.mun,
                      Nespecies= cores_vertnet [match (f.mun$id, 
                                                    cores_vertnet$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do INAT
+## plot
 c_vertnet <-   b + geom_polygon(data=f.mun_vertnet, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -908,7 +908,9 @@ f_vertnet <- c_vertnet +
         axis.ticks = element_blank(),
         plot.margin = unit(c(-4,-0.1, 0, -0.1), "lines"))
 # top, right, bottom, and left margins
-## concenso entre as bases
+
+
+## agreement between datasets (concensus map)
 
 cores_concenso <- cbind(apply (df_mun_rhea, 1, max,na.rm=T), 
                   cores_gbif$cores, 
@@ -916,20 +918,20 @@ cores_concenso <- cbind(apply (df_mun_rhea, 1, max,na.rm=T),
                   cores_vertnet$cores,
                   cores_wiki$cores)
 
-## numero de deteccoes por base
+## N of detections per dataset
 apply(cores_concenso, 2, function (i) sum (i > 0,na.rm=T))
 #sum(apply (df_mun_rhea, 1, max,na.rm=T)>0)
-# numero de municipios com dados coletados
+# number of municipalities with data
 apply(cores_concenso, 2, function (i) sum (i >= 0,na.rm=T))
 #sum(apply (df_mun_rhea, 1, max,na.rm=T)>=0)
 
-# cores
+# colors
 cores_concenso <- data.frame (cores= apply (cores_concenso,1,max,na.rm=T),
                           NM_MUNICIP=shape_RS$NM_MUNICIP)
 
-## numero de municipios com observacao concenso
+## number of municipalities with observation (concensus map)
 sum(cores_concenso$cores>0,na.rm=T)
-# municipios na concenso sem amostra
+# municipalities without samples
 table(is.infinite(cores_concenso$cores))
 
 # fortify
@@ -937,7 +939,7 @@ f.mun_con <- cbind (f.mun,
                      Nespecies= cores_concenso [match (f.mun$id, 
                                                        cores_concenso$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do INAT
+## map
 c_con <-   b + geom_polygon(data=f.mun_con, aes(x=long, y=lat, group=group, 
                                                   color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -969,7 +971,8 @@ f_con<- c_con +
 
 # top, right, bottom, and left margins
 
-######### arranjar o painel
+######### arrange plots into a panel
+
 pdf(file=here ("output","maps_observation.pdf"),width = 7,height = 5,family="serif")
 
 grid.arrange(f_north_ebird, f_gbif,f_wiki,
@@ -983,12 +986,12 @@ dev.off()
 
 
 # -------------------------------------------------------
-#   Experts vs incerteza
+#   Experts vs uncertainty
 
 f.mun_difference_incerteza <- f.mun_expert
 f.mun_difference_incerteza$Nespecies <- f.mun_expert$Nespecies - f.mun_incerteza$Nespecies
 
-## inserir deteccoes do GBIF
+## map
 c_diff_incerteza <-   b + geom_polygon(data=f.mun_difference_incerteza, aes(x=long, y=lat, group=group, 
                                                         color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -1055,7 +1058,7 @@ expert_rhea<- ifelse(is.na(expert_rhea),0,1)
 # summing and getting presence
 expert_rhea_presence <- ifelse (rowSums (expert_rhea)>1,1,0)
 
-## osbrepor o expert com mapa do RS
+## overlap map 
 cores_expert <- data.frame (cores= expert_rhea_presence,
                             NM_MUNICIP=shape_RS$NM_MUNICIP)
 sum(cores_expert$cores)
@@ -1065,7 +1068,7 @@ f.mun_expert <- cbind (f.mun,
                        Nespecies= cores_expert [match (f.mun$id, 
                                                        cores_expert$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## plot detections
 c_expert <-   b + geom_polygon(data=f.mun_expert, aes(x=long, y=lat, group=group, 
                                                       color=Nespecies, fill=Nespecies), 
                                colour = NA, size=1) + 
@@ -1123,13 +1126,13 @@ i_expert
 dev.off()
 
 # ----------------------------------------------------------------- #
-## avestruz
+## ostrich
 
 
 load(here("data","organized_data", "dados_covariaveis.RData"))
 
 
-## osbrepor o expert com mapa do RS
+## ostrich data
 cores_avestruz <- data.frame (cores= presenca_avestruz$Avestruzes,
                             NM_MUNICIP=shape_RS$NM_MUNICIP)
 sum(cores_avestruz$cores)
@@ -1139,7 +1142,7 @@ f.mun_avestruz <- cbind (f.mun,
                        Nespecies= cores_avestruz [match (f.mun$id, 
                                                        cores_avestruz$NM_MUNICIP),]$cores)
 
-## inserir deteccoes do GBIF
+## ostrich detections
 c_avestruz <-   b + geom_polygon(data=f.mun_avestruz, aes(x=long, y=lat, group=group, 
                                                       color=Nespecies, fill=Nespecies), 
                                colour = NA, size=1) + 
@@ -1175,44 +1178,4 @@ f_avestruz <- c_avestruz +
 pdf(here ("output","avestruz.pdf"),width=7,height=7)
 f_avestruz
 dev.off()
-
-# garbage
-
-
-## extrair legenda
-require(gridExtra)
-get_legend<-function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
-}
-
-legenda_comum <- get_legend(f_50km_legend) ## tem que primeiro gerar um mapa com legenda
-
-## plot para o painel (sem a legenda)  
-f_10km <- e_10km + 
-  xlab("Longitude") + ylab("Latitude") +
-  theme(panel.border = element_blank(), 
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        legend.position = "none", 
-        panel.background = element_rect(fill = "lightcyan", 
-                                        colour = "lightcyan", 
-                                        size = 0.5, 
-                                        linetype = "solid"),
-        plot.title = element_text(size=9),
-        legend.title = element_blank(),
-        legend.text = element_blank(),
-        legend.key.width=unit(0.4,"cm"),
-        legend.key.size = unit(0.5,"cm"),
-        axis.text=element_text(size=5),
-        axis.text.x = element_text(size=5),
-        axis.title.x = element_text(size = 8),
-        axis.text.y = element_text(size=5),
-        axis.title.y = element_text(size = 8),
-        plot.margin = unit(c(0.2,-2, -3.5, -1.0), "lines"))
-# top, right, bottom, and left margins
-
-
 
