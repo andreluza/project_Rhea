@@ -11,6 +11,7 @@ shape_RS <- readOGR(dsn=here("data","shape_munRS"),
 
 ## lakes (will use them when mapping)
 lagos <- shape_RS [c(96,250),]
+
 ## remove lakes
 shape_RS <- shape_RS [-c(96,250),]
 
@@ -52,8 +53,9 @@ res_occ_models <- list(null=out_null_model1,
                    complete25 = out_complete_model6[[2]],
                    complete50 = out_complete_model6[[3]]
 )
+
 # df for model ranking
-# loade deviance
+# load deviance
 load(here("output","deviance.RData"))
 
 # estimates of number occupied municipalities (true occupancy)
@@ -98,7 +100,6 @@ cores_50km <- data.frame (cores= res_occ_models$spatial50$mean$z [order(teste_or
                      NM_MUNICIP=shape_RS$NM_MUNICIP)
 
 # fortify
-require(ggplot2)
 f.mun<-fortify(shape_RS, region="NM_MUNICIP")
 f.mun_50km<- cbind (f.mun, 
                Nespecies= cores_50km [match (f.mun$id, cores_50km$NM_MUNICIP),]$cores)
@@ -114,7 +115,7 @@ b <- a + geom_polygon (data=lagos,aes(x=long, y=lat, group=group),
 ## insert estimates
 c_50km <-   b + geom_polygon(data=f.mun_50km, aes(x=long, y=lat, group=group, 
                                         color=Nespecies, fill=Nespecies), colour = NA, size=1) + 
-  labs (title= "Species distribution modeling (SDM)")+
+  labs (title= "A) Species distribution modeling (SDM)")+
   scale_fill_gradient2 (low='white', high='darkred', 
                         midpoint= 0.2,
                         na.value = "white",
@@ -172,7 +173,7 @@ f_50km_legend <- e_50km +
 f_50km_legend <- f_50km_legend + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                               colour = "black", 
                               fill=NA,
-                              size=1,
+                              size=0.5,
 					linetype = "dashed")
 
 # north
@@ -194,13 +195,15 @@ expert_data <- lapply (files_expert, function (i)
 crs(shape_RS)<-crs (expert_data[[1]]$Shape_Mun)
 expert_rhea<-lapply (expert_data, function (i) 
   over (shape_RS,i$Shape_Mun))
+
 # melt the list
 expert_rhea<- do.call(cbind,expert_rhea)
+
 # adjusting
 expert_rhea<- ifelse(is.na(expert_rhea),0,1)
 
 # summing and getting presence
-expert_rhea_presence <- ifelse (rowSums (expert_rhea)>1,1,0)
+expert_rhea_presence <- rowSums (expert_rhea)/ncol(expert_rhea)# ifelse (rowSums (expert_rhea)>1,1,0)
 
 ## over expert and RS maps
 cores_expert <- data.frame (cores= expert_rhea_presence,
@@ -214,14 +217,18 @@ f.mun_expert <- cbind (f.mun,
                                                        cores_expert$NM_MUNICIP),]$cores)
 
 ## insert expert data
-c_expert <-   b + geom_polygon(data=f.mun_expert, aes(x=long, y=lat, group=group, 
-                                                      color=Nespecies, fill=Nespecies), 
-                               colour = NA, size=1) + 
-  labs (title= "Expert knowledge") +
-  scale_fill_gradient2 (low='white', high='#284E78', midpoint= 0.20,na.value = "gray85",
+c_expert <-   b + geom_polygon(data=f.mun_expert, aes(x=long, 
+                                                      y=lat,
+                                                      group=group, 
+                                                      color=Nespecies, 
+                                                      fill=Nespecies), 
+                               colour = NA, 
+                               size=1) + 
+  labs (title= "B) Expert-based occurrence") +
+  scale_fill_gradient2 (low='white', high='#284E78',na.value = "gray85",
                         limits=c(0,1), 
-                        #breaks=seq(0,max(cores_50km$cores,na.rm=T),by=0.2),
-                        name="Detected") ## para continuo
+                        breaks=seq(0,max(cores_50km$cores,na.rm=T),by=0.2),
+                        name="Proportion") ## para continuo
 
 f_expert <- c_expert +
   xlab("") + ylab("") +
@@ -233,9 +240,14 @@ f_expert <- c_expert +
                                         size = 0.5, 
                                         linetype = "solid"),
         plot.title = element_text(size=9),
-        legend.title = element_blank(),
-        legend.text = element_blank(),
-        legend.position = "none",
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=6),
+        legend.key.width=unit(0.85,"cm"),
+        legend.key.size = unit(0.40,"cm"),
+        legend.position = "bottom",
+        legend.justification = 0.5,
+        legend.direction="horizontal",
+        legend.box="horizontal",
         axis.text=element_text(size=3),
         axis.text.x = element_blank(),
         axis.title.x = element_text(size = 4),
@@ -262,9 +274,11 @@ f_expert <- c_expert +
 i_expert<- f_expert + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                                     colour = "black", 
                                     fill=NA,
-                                    size=1)
+                                    size=0.5,
+                                    linetype = "dashed")
 
 i_expert
+
 
 # plot ber biome
 pampa_mun <- over (shape_RS, pampa)
@@ -284,27 +298,73 @@ pampa_mun<- rbind (pampa_mun,
                    expert)
 pampa_mun[which(pampa_mun$ID == "Pampa" & pampa_mun$data == "Expert"), "z"]
 pampa_mun[which(pampa_mun$ID == "Pampa"), "z"]
+# set the interaction
+pampa_mun$interaction <- interaction (pampa_mun$data, pampa_mun$ID)
+pampa_mun$interaction<-factor (pampa_mun$interaction,
+                               levels= c("Expert.Atlantic Forest",
+                                         "SDM.Atlantic Forest",
+                                         "Expert.Pampa",
+                                         "SDM.Pampa"))
 
-# difference
-summary(aov(pampa_mun$z~pampa_mun$ID*pampa_mun$data))
-summary(lm(pampa_mun$z~pampa_mun$ID*pampa_mun$data-1))
+# test
+require(brms)
+anova_test <- brm (formula = z~interaction,
+     data=pampa_mun)
+
+
+# predictoins
+require(emmeans)
+require(dplyr)
+library(tidyverse)
+library(tidybayes)
+
+anova_test %>%
+  emmeans( ~ interaction) %>%
+  gather_emmeans_draws() %>%
+  ggplot(aes(x = interaction, y = .value)) +
+  geom_line(aes(group = .draw), alpha = .005) +
+  stat_pointinterval() +
+  #facet_grid(~ data) +
+  theme_light()
+
+
+# post hoc
+
+anova_test %>%
+  emmeans( ~ interaction)
+
+# plot 
+# based on this: https://gist.github.com/jebyrnes/d1bdea4ad4c8736c4b9e7ac290e8c940
+
+violin_biome<-anova_test %>%
+  emmeans( ~ interaction) %>%
+  gather_emmeans_draws() %>%
+  ggplot(aes(x = interaction, y = .value, 
+             fill = substr (interaction,1,3))) +
+  geom_jitter(alpha = 0.005)+
+  geom_eye(alpha=0.5) +
+  stat_summary(aes(group = NA), fun.y = mean, geom = "line") +
+  theme_bw()+
+  ggtitle ("C) Variation in occurrence between\nbiomes and mapping approach")+
+  xlab ("Biome") + 
+  ylab (expression("Occurrence"))+
+  theme(legend.position = "none")
+
 
 # violin
-volin_biome <- ggplot (data = pampa_mun, aes (x=ID,
-                                              y=z,
-                                              fill=data,
-                                              colour=data)) + 
-  geom_violin(size=1) + 
-  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
-  theme_classic() + xlab ("Biome") + 
-	ylab (expression("Realized occurrence")) +
-  theme (axis.title = element_text(size=15),
-         axis.text = element_text(size=13))
+#volin_biome <- ggplot (data = pampa_mun, aes (x=ID,
+#                                              y=z,
+#                                              fill=data,
+#                                              colour=data)) + 
+#  geom_violin(size=1,alpha =0.3) + 
+#  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
+#  theme_classic() + xlab ("Biome") + 
+#	ylab (expression("Realized occurrence")) +
+#  theme (axis.title = element_text(size=13),
+#         axis.text = element_text(size=11),
+#         legend.position=c(0.1,0.9))+
+#  ggtitle ("C) Variation in occurrence between\nbiomes and mapping approach")
 
-
-pdf(file=here ("output","volin_biome.pdf"),width = 5,height = 5,family="serif")
-volin_biome
-dev.off()
 
 
 # ----------------------------------------------------- #
@@ -318,8 +378,9 @@ f.mun_difference$Nespecies <- f.mun_expert$Nespecies - f.mun_50km$Nespecies
 c_diff <-   b + geom_polygon(data=f.mun_difference, aes(x=long, y=lat, group=group, 
                                                         color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
-  labs (title= "Map of the difference") +
-  scale_fill_gradient2 (low='darkred',mid="white", 
+  labs (title= "C) Map of the difference") +
+  scale_fill_gradient2 (low='darkred',
+                        mid="white", 
                         high='#284E78', 
                         midpoint= 0,na.value = "gray85",
                         limits=c(-1,1), 
@@ -348,10 +409,10 @@ f_diff <- c_diff +
 i_diff<-f_diff + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                                colour = "black", 
                                fill=NA,
-                               size=1,
+                               size=0.5,
                                linetype = "dashed")
 
-pdf(file=here ("output","arranjo_expert_estimate_diff.pdf"),width = 6,height = 6,family="serif")
+pdf(file=here ("output","arranjo_expert_estimate_diff"),width = 6,height = 6,family="serif")
 
 grid.arrange(f_50km_legend,
              i_expert,
@@ -366,10 +427,10 @@ grid.arrange(f_50km_legend,
 
 dev.off()
 
-# -----------------------
-# tabela de agreement
+#-----------------------
+# table of agreement
 
-diferenca <- data.frame (exp=as.factor(cores_expert$cores),
+diferenca <- data.frame (exp=(cores_expert$cores),
                          sdm=cores_50km$cores,
                          diff=cores_expert$cores - cores_50km$cores)
 
@@ -379,25 +440,83 @@ t(data.frame ('Only expert' = table (diferenca$diff > 0)[2], # perito
 )
 
 
-abs_diff <- ggplot (data = diferenca, aes (x=exp,
-                               y=abs(diff),
-                               fill=exp
-                               )) + 
-  geom_violin(size=1) + 
-  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
-  theme_classic() + 
-  xlab ("Occurrence based on the expert knowledge") + 
-  ylab (expression("Absolute difference between expert and SDM")) +
-  theme (axis.title = element_text(size=15),
-         axis.text = element_text(size=13),
-         legend.position = "none")
 
-pdf(file=here ("output","abs_diff.pdf"),width = 5,height = 5,family="serif")
-abs_diff
+
+#abs_diff <- ggplot (data = diferenca, aes (x=exp,
+#                               y=abs(diff),
+#                               fill=exp
+#                               )) + 
+#  geom_violin(size=1) + 
+#  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
+#  theme_classic() + 
+#  xlab ("Occurrence based on the expert knowledge") + 
+#  ylab (expression("Absolute difference between expert and SDM")) +
+#  theme (axis.title = element_text(size=15),
+#         axis.text = element_text(size=13),
+#         legend.position = "none")
+#
+#pdf(file=here ("output","abs_diff.pdf"),width = 5,height = 5,family="serif")
+#abs_diff
+#dev.off()
+
+# bayesian models
+require(brms)
+
+# disagreement relative to expert knowledge
+brm (formula=abs(diff)~exp, data=diferenca,
+     family=gaussian)
+
+
+
+# binomial smooth 
+binomial_smooth <- function(...) {
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"),...)
+  # geom_smooth(method = "glm", method.args = list(family = "poisson"), ...) # glm option
+}
+
+# plot A
+plotB<-ggplot(data = diferenca,aes (x=exp,
+                             y=abs(diff)))+
+  geom_jitter(width = 0.05,col="gray50")+
+  binomial_smooth()+
+  theme_classic() +
+  theme (axis.title = element_text(size=13),
+         axis.text = element_text(size=11))+
+  xlab ("Occurrence based on expert knowledge")+
+  ylab ("Absolute difference between expert and SDM maps")+
+  ggtitle ("B) Disagreement inside and outside\nexpert polygons")
+
+
+#
+# the relationship between SDMs and experts 
+
+# disagreement relative to expert knowledge
+brm (formula=abs(sdm)~exp, 
+     data=diferenca,
+     family=gaussian)
+
+
+plotA<-ggplot(data = diferenca,aes (x=exp,
+                                    y=(sdm)))+
+  geom_jitter(width = 0.05,col="gray50")+
+  binomial_smooth()+
+  theme_classic() +
+  theme (axis.title = element_text(size=13),
+         axis.text = element_text(size=11))+
+  xlab ("Occurrence based on expert knowledge")+
+  ylab ("Realized occurrence")+
+  ggtitle ("A) Relationship between expert- and\nSDM-based occurrence")
+
+
+# save
+pdf(file=here ("output","abs_diff"),width = 12,height = 4,family="serif")
+grid.arrange(plotA,
+             plotB,
+             violin_biome,
+             ncol=3)
 dev.off()
 
-# 
-summary(aov(abs(diferenca$diff)~diferenca$exp))
 
 
 # ----------------------------------------
