@@ -16,4 +16,6 @@ link:
 
 <https://andreluza.shinyapps.io/dashboardapp/?_ga=2.49360814.9824114.1608313240-1160325263.1601748869>
 
-<img src="data/pictures/100_8188.JPG" width="60%" height="60%" style="display: block; margin: auto;" />
+<img src="RheaPicture.JPG" width="100%" height="100%" style="display: block; margin: auto;" />
+
+Picture taken by André Luza, Jaguarão - RS, 2013.

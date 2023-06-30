@@ -24,12 +24,10 @@ https://andreluza.shinyapps.io/dashboardapp/?_ga=2.49360814.9824114.1608313240-1
 
 
 
-
-
-```{r include=T,echo=F, warning=F, fig.align='center', out.width="60%",out.height="60%"}
+```{r include=T,echo=F, warning=F, fig.align='center', out.width="100%",out.height="100%"}
 # All defaults
 
-knitr::include_graphics("data/pictures/100_8188.JPG")
+knitr::include_graphics("RheaPicture.JPG")
 
 ```
 
