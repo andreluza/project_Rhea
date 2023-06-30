@@ -35,33 +35,33 @@ model_list <- list(null=out_null_model1,
 require(pROC)
 model_sel <- lapply (model_list, function (i) {
   
-  ## 1) Calcular a Deviance
-  # separar os dados observados (teste) - GBIF
+  ## 1) Calculate Deviance
+  # separate observed data (test) - GBIF
   Ytruth <- datGBOut[,"det"]
-  # separar os dados preditos/estimados pelo modelo - GBIF
+  # separate predicted/estimated by the model - GBIF
   Yhat <- i$mean$y.gbif6
   
-  # separar os dados observados (teste) - Wikiaves
+  # separate observed data (test) - Wikiaves
   Ytruth2 <- datWAOut[, "RHAMERICANA"]
-  # separar os dados preditos/estimados pelo modelo - Wikiaves
+  # separate predicted/estimated by the model - Wikiaves
   Yhat2 <- i$mean$y.wikiaves9
   
-  # separar os dados observados (teste) - eBird
+  # separate observed data (test)  - eBird
   Ytruth3 <- datEBOut[,1:n_so_ebird]
-  # separar os dados preditos/estimados pelo modelo - eBird
+  # separate predicted/estimated by the model - eBird
   Yhat3 <- i$mean$yEB10
   
-  # separar os dados observados (teste) - INat
+  # separate observed data (test)  - INat
   Ytruth4 <- datINTOut [,'det']
-  # separar os dados preditos/estimados pelo modelo - eBird
+  # separate predicted/estimated by the model - INat
   Yhat4 <- i$mean$y.inat7
   
-  # separar os dados observados (teste) - VertNet
+  # separate observed data (test)  - VertNet
   Ytruth5 <-datVEROut [,"det"]
-  # separar os dados preditos/estimados pelo modelo - eBird
+  # separate predicted/estimated by the model - VertNet
   Yhat5 <- i$mean$y.vertnet8
   
-  ## Deviance em cada base de dados:
+  ## Deviance of each dataset:
   # GBIF
   likhood <- (Yhat^Ytruth)*((1-Yhat)^(1-Ytruth))
   DEV <- -(2*(sum(log(likhood))))
@@ -91,12 +91,11 @@ model_sel <- lapply (model_list, function (i) {
   DEV5 <- -(2*(sum(lokLik5)))
   
   # Deviance total:
-  DEVtotal <- DEV + DEV2 + DEV3 + DEV4 + DEV5 # valor que deve ser comparado entre modelos.
-  # modelo com o menor valor de deviance tem 
-  # o melhor ajuste aos dados.
+  DEVtotal <- DEV + DEV2 + DEV3 + DEV4 + DEV5 # this value must be compared among models
+  # the model with the lowest deviance = most fitted to the data
   
   # ROC
-    # gbif
+  # gbif
   roc_res <- data.frame (gbif = roc(Ytruth, Yhat)$auc,
                          wikiaves = roc(Ytruth2, Yhat2)$auc,
                          ebird = roc(as.numeric(Ytruth3), as.numeric(Yhat3))$auc,
@@ -113,7 +112,7 @@ model_sel <- lapply (model_list, function (i) {
   res
 })
 
-## 2) Plotar curvas AUC
+## 2) Plot AUC curves
 
 deviance_sel <- sapply (model_sel,"[[","deviance")
 # data.frame (deviance_sel[order(deviance_sel)])
@@ -122,6 +121,7 @@ roc_crit <- sapply (model_sel,"[[","roc")
 
 save(deviance_sel,file=here ("output","deviance.RData"))
 
+rm(list=ls())
 
 
 
