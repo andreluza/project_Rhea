@@ -3,8 +3,8 @@
 .RData
 .Ruserdata
 output
-data/covariaveis
-data/deteccoes
+data/covariates
+data/detections
 data/geo
 data/South_America
 data/pictures
