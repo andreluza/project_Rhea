@@ -1,0 +1,5 @@
+43MUE250GC_SIR sao os arquivos do Shapefile do RS
+
+Destes municipios, 25 municipios nao tem area urbanizada definida. Por isso,
+criei poligonos no GOogle earth, e transformei o KML em shapefile no seguinte site: https://mygeodata.cloud/converter/kml-to-shp
+A pasta "mygeodata"tem o shapefile com o poligono deste municipios.

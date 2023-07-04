@@ -22,7 +22,7 @@ area_mun [which(shape_RS$NM_MUNICIP == "AMARAL FERRADOR")] # match
 #-------------------------------
 # site covariates (municipality)
 #-------------------------------
-load(here("data","organized_data", "dados_covariaveis.RData"))
+load(here("data","organized_data", "data_covariates.RData"))
 
 # aggregate grassland data
 campo <- usos_tabela$`Campo seco.area` + 
@@ -76,7 +76,7 @@ c_campo <-   ggplot() + geom_polygon(data=f.mun_sem, aes(x=long, y=lat, group=gr
                         limits=c(0,max(cores_sem$cores)), 
                         breaks=seq(0,max(cores_sem$cores,na.rm=T),by=500),
                         name=expression(sqrt("Area (km2)"))) ## para continuo
-
+# map details
 (c_campo <- c_campo + theme_classic() + 
     theme (axis.text = element_text(size=6),
            axis.title = element_text(size=8),
@@ -1890,7 +1890,6 @@ out_complete_model6  <- lapply (seq (1,3), function (i) {# length(adj)
 
 # save it
 save (out_complete_model6,file=here("output", "out_complete_model6.RData"))
-
 
 
 

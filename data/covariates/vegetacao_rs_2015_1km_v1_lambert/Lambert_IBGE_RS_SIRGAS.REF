@@ -1,0 +1,16 @@
+ref.system  : Lambert IBGE/Rio Grande do Sul
+projection  : Lambert Conformal Conic
+datum       : SIRGAS 2000
+delta WGS84 : 0 0 0
+ellipsoid   : GRS 1980
+major s-ax  : 6378137
+minor s-ax  : 6356752.314133
+origin long : -54
+origin lat  : 0
+origin X    : 0
+origin Y    : 0
+scale fac   : 1.0
+units       : m
+parameters  : 2
+stand ln 1  : -27
+stand ln 2  : -33

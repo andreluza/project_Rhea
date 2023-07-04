@@ -1,0 +1,14 @@
+ref.system  : SIRGAS 2000, Coordenadas geodésicas (Latitude/Longitude)
+projection  : none
+datum       : SIRGAS 2000
+delta WGS84 : 0 0 0
+ellipsoid   : GRS 1980
+major s-ax  : 6378137
+minor s-ax  : 6356752.314133
+origin long : 0
+origin lat  : 0
+origin X    : 0
+origin Y    : 0
+scale fac   : 1
+units       : deg
+parameters  : 0

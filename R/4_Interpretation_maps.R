@@ -3,6 +3,7 @@
 
 # load packages
 source ("R/packages.R")
+source ("R/functions.R")
 
 # shapefile RS 
 shape_RS <- readOGR(dsn=here("data","shape_munRS"), 
@@ -38,7 +39,8 @@ load(here("output", "out_complete_model6.RData"))
 
 # load validation data (for model selection)
 load(here("output", "validation_data.RData"))
-n_so_ebird<-11
+n_so_ebird<-11 # number of eBird lists
+
 #list modeels
 res_occ_models <- list(null=out_null_model1,
                    spatial10=out_model2[[1]],
@@ -77,7 +79,7 @@ best_ranked_mod <- which (deviance_models[,'deviance_sel'] == min (deviance_mode
 deviance_models_subset <- deviance_models[best_ranked_mod,] # set of best ranked models
 
 # correlation between estimates from diff models
-require(corrplot)
+
 par(mfrow=c(1,1),mar=c(5,5,5,5))
 corrplot(cor(do.call(cbind,lapply (res_occ_models, function (i) i$mean$z))),
          main="Correlation between estimates of z",
@@ -161,15 +163,8 @@ f_50km_legend <- e_50km +
         axis.title.y = element_text(size = 5),
         plot.title = element_text(size=8),
         plot.margin = unit(c(-0.1, -0.1,-0.1, -0.2), "lines")) 
-#        legend.margin = margin (0,0,0,0),
- #       legend.box.margin = margin(1,0,0,0)) 
 
-#pdf(file=here ("output","mapa_prob.pdf"),width = 4,height = 4,family="serif")
-
-#f_50km_legend
-
-#dev.off()
-
+# set legend
 f_50km_legend <- f_50km_legend + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                               colour = "black", 
                               fill=NA,
@@ -255,22 +250,7 @@ f_expert <- c_expert +
         axis.title.y = element_text(size = 4),
         axis.ticks = element_blank(),
         plot.margin = unit(c(-4,0, -0.5, 0), "lines"))
-# top, right, bottom, and left margins
-
-#g_expert <- f_expert + annotate(geom="text", x=-56, y=-32, label="URUGUAI",color="black",size=2.1) +
-#  annotate(geom="text", x=-56.5, y=-27.8, label="ARGENTINA",color="black",size=2.1)+
-#  annotate(geom="text", x=-56.5, y=-27, label="PARAGUAI",color="black",size=2.1)+
-#  annotate(geom="text", x=-51.8, y=-26.8, label="Santa Catarina",color="black",size=2.1)+
-#  annotate(geom="text", x=-50.5, y=-32.5, label="OCEANO ATL?NTICO",color="black",size=2.1)
-
-#h_expert <- g_expert + ggsn::scalebar(f.mun_expert, dist = 100, st.dist=0.03,st.size=2.2, height=0.02, 
-#                                      transform = TRUE, dist_unit = "km",
-#                                      model = 'WGS84', location = "bottomright")
-#
-#i_expert <- h_expert + ggsn::north(f.mun_50km, symbol=1,scale = 0.2,location = "bottomleft") +
-#  theme(legend.text=element_text(size=7),
-#        legend.title=element_text(size=8))
-
+# add pampa polygon
 i_expert<- f_expert + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                                     colour = "black", 
                                     fill=NA,
@@ -281,10 +261,14 @@ i_expert
 
 
 # plot ber biome
+crs(pampa)<-crs(shape_RS)
+
+
 pampa_mun <- over (shape_RS, pampa)
 pampa_mun$ID <- ifelse (pampa_mun$ID ==1, "Pampa", "Atlantic Forest")
 pampa_mun$ID[is.na(pampa_mun$ID)] <- "Atlantic Forest"
-# colar z
+
+# bind true occupancy z
 pampa_mun$z <- cores_50km$cores
 pampa_mun$data <- "SDM"
 
@@ -307,17 +291,12 @@ pampa_mun$interaction<-factor (pampa_mun$interaction,
                                          "SDM.Pampa"))
 
 # test
-require(brms)
-anova_test <- brm (formula = z~interaction,
-     data=pampa_mun)
+
+anova_test <- brms::brm (formula = z~interaction,
+                    data=pampa_mun)
 
 
-# predictoins
-require(emmeans)
-require(dplyr)
-library(tidyverse)
-library(tidybayes)
-
+# predictions
 anova_test %>%
   emmeans( ~ interaction) %>%
   gather_emmeans_draws() %>%
@@ -329,7 +308,6 @@ anova_test %>%
 
 
 # post hoc
-
 anova_test %>%
   emmeans( ~ interaction)
 
@@ -351,30 +329,14 @@ violin_biome<-anova_test %>%
   theme(legend.position = "none")
 
 
-# violin
-#volin_biome <- ggplot (data = pampa_mun, aes (x=ID,
-#                                              y=z,
-#                                              fill=data,
-#                                              colour=data)) + 
-#  geom_violin(size=1,alpha =0.3) + 
-#  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
-#  theme_classic() + xlab ("Biome") + 
-#	ylab (expression("Realized occurrence")) +
-#  theme (axis.title = element_text(size=13),
-#         axis.text = element_text(size=11),
-#         legend.position=c(0.1,0.9))+
-#  ggtitle ("C) Variation in occurrence between\nbiomes and mapping approach")
-
-
-
 # ----------------------------------------------------- #
 
-# arranjo do modelo, experts, e diferenca
+# arrange panel  SDM, experts, difference
 
 f.mun_difference <- f.mun_expert
 f.mun_difference$Nespecies <- f.mun_expert$Nespecies - f.mun_50km$Nespecies
 
-## inserir deteccoes do GBIF
+## plot difference
 c_diff <-   b + geom_polygon(data=f.mun_difference, aes(x=long, y=lat, group=group, 
                                                         color=Nespecies, fill=Nespecies), 
                              colour = NA, size=1) + 
@@ -384,8 +346,7 @@ c_diff <-   b + geom_polygon(data=f.mun_difference, aes(x=long, y=lat, group=gro
                         high='#284E78', 
                         midpoint= 0,na.value = "gray85",
                         limits=c(-1,1), 
-                        #breaks=seq(0,max(cores_50km$cores,na.rm=T),by=0.2),
-                        name="Expert - SDM") ## para continuo
+                        name="Expert - SDM")
 
 f_diff <- c_diff +
   xlab("") + ylab("") +
@@ -412,7 +373,7 @@ i_diff<-f_diff + geom_polygon (data=pampa,aes(x=long, y=lat, group=group),
                                size=0.5,
                                linetype = "dashed")
 
-pdf(file=here ("output","arranjo_expert_estimate_diff"),width = 6,height = 6,family="serif")
+pdf(file=here ("output","arranjo_expert_estimate_diff.pdf"),width = 6,height = 6,family="serif")
 
 grid.arrange(f_50km_legend,
              i_expert,
@@ -441,39 +402,12 @@ t(data.frame ('Only expert' = table (diferenca$diff > 0)[2], # expert
 
 
 
-
-#abs_diff <- ggplot (data = diferenca, aes (x=exp,
-#                               y=abs(diff),
-#                               fill=exp
-#                               )) + 
-#  geom_violin(size=1) + 
-#  stat_summary(fun=mean,geom="point", shape=19, size=3) + 
-#  theme_classic() + 
-#  xlab ("Occurrence based on the expert knowledge") + 
-#  ylab (expression("Absolute difference between expert and SDM")) +
-#  theme (axis.title = element_text(size=15),
-#         axis.text = element_text(size=13),
-#         legend.position = "none")
-#
-#pdf(file=here ("output","abs_diff.pdf"),width = 5,height = 5,family="serif")
-#abs_diff
-#dev.off()
-
 # bayesian models
-require(brms)
-
 # disagreement relative to expert knowledge
 brm (formula=abs(diff)~exp, data=diferenca,
      family=gaussian)
 
 
-
-# binomial smooth 
-binomial_smooth <- function(...) {
-  geom_smooth(method = "glm", 
-              method.args = list(family = "binomial"),...)
-  # geom_smooth(method = "glm", method.args = list(family = "poisson"), ...) # glm option
-}
 
 # plot A
 plotB<-ggplot(data = diferenca,aes (x=exp,
@@ -490,13 +424,12 @@ plotB<-ggplot(data = diferenca,aes (x=exp,
 
 #
 # the relationship between SDMs and experts 
-
 # disagreement relative to expert knowledge
 brm (formula=abs(sdm)~exp, 
      data=diferenca,
      family=gaussian)
 
-
+# plot
 plotA<-ggplot(data = diferenca,aes (x=exp,
                                     y=(sdm)))+
   geom_jitter(width = 0.05,col="gray50")+
@@ -520,7 +453,7 @@ dev.off()
 
 
 # ----------------------------------------
-# Uncertainty map
+#             Uncertainty map
 # -----------------------------------------
 
 # data frame, reordering municipalities
@@ -585,12 +518,12 @@ f_incerteza <- e_incerteza +
         plot.margin = unit(c(-0.1, -0.1,-0.1, -0.2), "lines")) 
 #        legend.margin = margin (0,0,0,0),
 #       legend.box.margin = margin(1,0,0,0)) 
-
+# set north
 f_incerteza<- f_incerteza + ggsn::north(f.mun_incerteza, symbol=1,scale = 0.2,location = "bottomleft") +
   theme(legend.text=element_text(size=7),
         legend.title=element_text(size=8))
 
-pdf(file=here ("output","mapa_incerteza.pdf"),width = 5,height = 5,family="serif")
+pdf(file=here ("output","map_uncertainty.pdf"),width = 5,height = 5,family="serif")
 f_incerteza
 dev.off()
 
@@ -598,7 +531,7 @@ dev.off()
 # -----------------------------------------
 #         MAP OF OBSERVATIONS	
 # -----------------------------------------
-require(ggplot2)
+
 f.mun<-fortify(shape_RS, region="NM_MUNICIP")
 
 ## SOUTH AMERICA SHAPEFILE
@@ -610,8 +543,7 @@ b <- a + geom_polygon (data=lagos,aes(x=long, y=lat, group=group),
                        fill="lightcyan",colour = "lightcyan", size=1)
 
 ## ebird detections
-
-load (here("data","deteccoes", "ebird", "INPUT_ebird.RData"))## gbif
+load (here("data","detections", "ebird", "INPUT_ebird.RData"))## gbif
 ebird_rhea <- apply (df_mun_rhea, 1, max,na.rm=T)
 
 ## map of detections
@@ -682,14 +614,6 @@ f_ebird_legend <- e_ebird +
 f_ebird_legend
 
 ## extract legend
-require(gridExtra)
-get_legend<-function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
-}
-
 legenda_comum_data <- get_legend(f_ebird_legend) ## get legend 
 
 ## remove legend
@@ -716,6 +640,7 @@ f_ebird <- e_ebird +
         plot.margin = unit(c(-0.1,-0.1, -3.9, 0.05), "lines"))
 # top, right, bottom, and left margins
 
+# add north
 f_north_ebird <- f_ebird + ggsn::north(f.mun_ebird, symbol=1,scale = 0.2,location = "bottomleft") +
   theme(legend.text=element_text(size=7),
         legend.title=element_text(size=8))
@@ -723,7 +648,7 @@ f_north_ebird <- f_ebird + ggsn::north(f.mun_ebird, symbol=1,scale = 0.2,locatio
 f_north_ebird
 
 ## gbif detections
-load (here("data","deteccoes", "Gbif", "input_GBIF.RData"))## gbif
+load (here("data","detections", "Gbif", "input_GBIF.RData"))## gbif
 
 ## map detections
 cores_gbif <- data.frame (cores= dados_det_ema_gbif$det,
@@ -771,7 +696,7 @@ f_gbif <- c_gbif +
 
 
 ##  wikiaves detections
-load (here("data","deteccoes", "wikiaves", "input_wikiaves.RData"))## gbif
+load (here("data","detections", "wikiaves", "input_wikiaves.RData"))## gbif
 
 ## map of detections
 cores_wiki <- data.frame (cores= dados_wikiaves$RHAMERICANA,
@@ -779,7 +704,7 @@ cores_wiki <- data.frame (cores= dados_wikiaves$RHAMERICANA,
 
 cores_wiki$cores [which (dados_wikiaves$NSPECIES == 0)] <- NA
 
-# forityf
+# fortify
 f.mun_wiki <- cbind (f.mun, 
                     Nespecies= cores_wiki [match (f.mun$id, 
                                                   cores_wiki$NM_MUNICIP),]$cores)
@@ -819,7 +744,7 @@ f_wiki <- c_wiki +
 f_wiki
 
 ##INAT detections
-load (here("data","deteccoes", "outras_bases_INAT", "input_INAT.RData"))## gbif
+load (here("data","detections", "outras_bases_INAT", "input_INAT.RData"))## gbif
 
 ## map
 cores_inat <- data.frame (cores= dados_det_ema_inat$det,
@@ -864,7 +789,7 @@ f_inat<- c_inat +
 # top, right, bottom, and left margins
 
 ## vertnet detections
-load (here("data","deteccoes", "vertnet", "input_VERTNET.RData"))## gbif
+load (here("data","detections", "vertnet", "input_VERTNET.RData"))## gbif
 
 ## map
 cores_vertnet <- data.frame (cores= dados_det_ema_vertnet$det,
@@ -1031,7 +956,7 @@ f_diff_incerteza <- c_diff_incerteza +
 # top, right, bottom, and left margins
 
 
-pdf(file=here ("output","diff_incerteza.pdf"),width = 5,height = 5,family="serif")
+pdf(file=here ("output","diff_uncertainty.pdf"),width = 5,height = 5,family="serif")
 f_diff_incerteza
 dev.off()
 
@@ -1100,21 +1025,7 @@ f_expert <- c_expert +
         plot.margin = unit(c(-4,0, -0.5, 0), "lines"))
 # top, right, bottom, and left margins
 
-
-#g_expert <- f_expert + annotate(geom="text", x=-56, y=-32, label="URUGUAI",color="black",size=2.1) +
-#  annotate(geom="text", x=-56.5, y=-27.8, label="ARGENTINA",color="black",size=2.1)+
-#  annotate(geom="text", x=-56.5, y=-27, label="PARAGUAI",color="black",size=2.1)+
-#  annotate(geom="text", x=-51.8, y=-26.8, label="Santa Catarina",color="black",size=2.1)+
-#  annotate(geom="text", x=-50.5, y=-32.5, label="OCEANO ATL?NTICO",color="black",size=2.1)
-
-#h_expert <- g_expert + ggsn::scalebar(f.mun_expert, dist = 100, st.dist=0.03,st.size=2.2, height=0.02, 
-#                                      transform = TRUE, dist_unit = "km",
-#                                      model = 'WGS84', location = "bottomright")
-#
-#i_expert <- h_expert + ggsn::north(f.mun_50km, symbol=1,scale = 0.2,location = "bottomleft") +
-#  theme(legend.text=element_text(size=7),
-#        legend.title=element_text(size=8))
-
+# add pampa
 i_expert<- f_expert + geom_polygon (data=pampa,aes(x=long, y=lat, group=group), 
                                     colour = "black", 
                                     fill=NA,
@@ -1129,7 +1040,7 @@ dev.off()
 ## ostrich
 
 
-load(here("data","organized_data", "dados_covariaveis.RData"))
+load(here("data","organized_data", "data_covariates.RData"))
 
 
 ## ostrich data
@@ -1175,7 +1086,7 @@ f_avestruz <- c_avestruz +
         plot.margin = unit(c(-4,0, -0.5, 0), "lines"))
 # top, right, bottom, and left margins
 
-pdf(here ("output","avestruz.pdf"),width=7,height=7)
+pdf(here ("output","ostrich.pdf"),width=7,height=7)
 f_avestruz
 dev.off()
 

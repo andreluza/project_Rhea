@@ -1,0 +1,2 @@
+Posso substituir os "X" por NA, e então estimar os valores com base no numero de estabelecimentos,
+que é a unica variavel que tem valores para todos os municipios.

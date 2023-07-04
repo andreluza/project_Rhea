@@ -3,6 +3,9 @@
 # run this will save data into the folder "organized_data", within data
 # each source will provide a map
 
+# load packages
+source("R/packages.R")
+
 # open a pallette for six maps
 par(mfrow=c(3,2),mar=c(0,0,1,1))
 
@@ -10,25 +13,25 @@ par(mfrow=c(3,2),mar=c(0,0,1,1))
 source("data/expert_opinion/expert.R")
 
 # run code to organize and save GBif data
-source("data/deteccoes/Gbif/codes_GBIF.R")
+source("data/detections/Gbif/codes_GBIF.R")
 
 # run code to organize and save Inaturalist data
-source("data/deteccoes/outras_bases_INAT/codes_iNaturalist.R") 
+source("data/detections/outras_bases_INAT/codes_iNaturalist.R") 
 
 # run code to organize and save vertnet data
-source("data/deteccoes/vertnet/codes_VertNet.R")
+source("data/detections/vertnet/codes_VertNet.R")
 
 # run code to organize and save wikiaves data
-source("data/deteccoes/wikiaves/codes_wikiAves.R")
+source("data/detections/wikiaves/codes_wikiAves.R")
 
 # run code to organize and save EBird data
-source("data/deteccoes/ebird/codes_eBird.R")
+source("data/detections/ebird/codes_eBird.R")
 
 # -------------------------------------------------
 # site and spatial covariates
 
 # this can take a little because it is needed to extract data from landcover maps
-source("data/covariaveis/codigos_org_covariaveis.R")
+source("data/covariates/codes_organization_covariates.R")
 
 
 

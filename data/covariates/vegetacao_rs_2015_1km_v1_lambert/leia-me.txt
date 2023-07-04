@@ -1,0 +1,7 @@
+Coordenadas geodésicas (Latitude e Longitude):
+
+Para citar o material pedimos a gentileza de usar a seguinte referência:
+
+Hofmann, G.S.; Weber, E.J.; Hasenack, H. (Org.). Uso e cobertura vegetal do Estado do Rio Grande do Sul – situação em 2015. Porto Alegre: UFRGS IB Centro de Ecologia, 2015. 1a ed. ISBN 978-85-63843-22-7. Disponível em: http://www.ufrgs.br/labgeo
+
+Weber, E.J.; Hasenack, H.; Pinto, F.P.; Moraes, B.Z. Mosaico de imagens de satélite Landsat do Estado do Rio Grande do Sul – ano base 2015. Porto Alegre: UFRGS IB Centro de Ecologia, 2015. 1a ed. ISBN 978-85-63843-25-8. Disponível em: http://www.ufrgs.br/labgeo

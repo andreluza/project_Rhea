@@ -32,7 +32,7 @@ model_list <- list(null=out_null_model1,
 
 # roc curve
 # deviance
-require(pROC)
+
 model_sel <- lapply (model_list, function (i) {
   
   ## 1) Calculate Deviance
@@ -116,6 +116,9 @@ model_sel <- lapply (model_list, function (i) {
 
 deviance_sel <- sapply (model_sel,"[[","deviance")
 # data.frame (deviance_sel[order(deviance_sel)])
+
+# OBS: not possible to test deviance for VertNet data, as validation 
+# dataset did not have detections (the data is too sparse)
 
 roc_crit <- sapply (model_sel,"[[","roc")
 
