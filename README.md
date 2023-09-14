@@ -7,14 +7,20 @@ AL Luza, AV Rodrigues, L Mamalis, V Zulian
 <!-- badges: start -->
 <!-- badges: end -->
 
-Spatial distribution of the Greater Rhea, *Rhea americana* (Linnaeus,
-1758), in Rio Grande do Sul, southern Brazil: citizen-science data,
-probabilistic mapping, and comparison with expert knowledge
+### Spatial distribution of the Greater Rhea, *Rhea americana* (Linnaeus, 1758), in Rio Grande do Sul, southern Brazil: citizen-science data, probabilistic mapping, and comparison with expert knowledge
 
-You can find the app we used to get expert opinion in the following
-link:
+#### The paper can be accessed in the following link:
+
+<https://link.springer.com/article/10.1007/s43388-023-00143-3>
+
+#### You can find the app we used to get expert opinion in the following link:
 
 <https://andreluza.shinyapps.io/dashboardapp/?_ga=2.49360814.9824114.1608313240-1160325263.1601748869>
+
+#### DOI from GBIF dataset (Lacking in the main text):
+
+GBIF.org (02 March 2020) GBIF Occurrence Download
+<https://doi.org/10.15468/dl.00u0bd>
 
 <img src="RheaPicture.JPG" width="100%" height="100%" style="display: block; margin: auto;" />
 Picture taken by André Luza in Jaguarão, Rio Grande do Sul, 2013.
@@ -97,6 +103,6 @@ Picture taken by André Luza in Jaguarão, Rio Grande do Sul, 2013.
     ## [112] classInt_0.4-9       ps_1.7.5             plyr_1.8.8          
     ## [115] stringi_1.7.12       rstan_2.21.8         deldir_1.0-6        
     ## [118] assertthat_0.2.1     munsell_0.5.0        lazyeval_0.2.2      
-    ## [121] colourpicker_1.2.0   Brobdingnag_1.2-9    Matrix_1.5-4        
+    ## [121] colourpicker_1.2.0   Brobdingnag_1.2-9    Matrix_1.6-1        
     ## [124] hms_1.1.3            shiny_1.7.4          highr_0.10          
     ## [127] igraph_1.4.2         RcppParallel_5.1.7
