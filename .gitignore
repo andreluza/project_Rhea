@@ -17,3 +17,4 @@ output_sensitivity
 R/Copy*.R
 R/*sensitivity.R
 R/*codigos.R
+*.pdf
